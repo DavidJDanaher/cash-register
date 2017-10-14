@@ -38,6 +38,20 @@ public class CashRegister {
         return contents;
     }
 
+    public int getTotalValue() {
+        int value = 0;
+
+        for(String key: contents.keySet()) {
+            value += computeDenominationValue(key);
+        }
+
+        return value;
+    }
+
+    private int computeDenominationValue(String bill) {
+        return contents.get(bill) * billValues.get(bill);
+    }
+
     public void addToContents(int ones, int twos, int fives, int tens, int twenties) {
         if (ones > 0) {
             contents.put("ONE", contents.get("ONE") + ones);
