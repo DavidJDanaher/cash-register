@@ -1,6 +1,6 @@
 package main.java;
 
-import main.java.excpetions.InsufficientFundsException;
+import main.java.exceptions.InsufficientFundsException;
 import main.java.resources.DollarValueConstants;
 import main.java.resources.RegisterContents;
 
@@ -67,20 +67,17 @@ public class CashRegister {
 
         while (changeDue >= dollars.TWENTY && contents.get(TWENTY) > 0) {
             changeDue -= dollars.TWENTY;
-            contents.put(TWENTY, contents.get(TWENTY) - 1);
             change.put(TWENTY, change.get(TWENTY) + 1);
         }
 
         while (changeDue >= dollars.TEN && contents.get(TEN) > 0) {
             changeDue -= dollars.TEN;
-            contents.put(TEN, contents.get(TEN) - 1);
             change.put(TEN, change.get(TEN) + 1);
         }
 
         while (changeDue >= dollars.FIVE && contents.get(FIVE) > 0) {
             if (changeDue % 2 == 1 || contents.get(ONE) > 0) {
                 changeDue -= dollars.FIVE;
-                contents.put(FIVE, contents.get(FIVE) - 1);
                 change.put(FIVE, change.get(FIVE) + 1);
             } else {
                 break;
@@ -89,13 +86,11 @@ public class CashRegister {
 
         while (changeDue >= dollars.TWO && contents.get(TWO) > 0) {
             changeDue -= dollars.TWO;
-            contents.put(TWO, contents.get(TWO) - 1);
             change.put(TWO, change.get(TWO) + 1);
         }
 
         while (changeDue >= dollars.ONE && contents.get(ONE) > 0) {
             changeDue -= dollars.ONE;
-            contents.put(ONE, contents.get(ONE) - 1);
             change.put(ONE, change.get(ONE) + 1);
         }
 
@@ -103,60 +98,24 @@ public class CashRegister {
             change.clear();
             throw new InsufficientFundsException("change");
         } else {
-//            removeContents();
+            removeContents(change);
         }
 
         return change;
     }
 
-    public void addToContents(int ones, int twos, int fives, int tens, int twenties) {
-        if (ones > 0) {
-            contents.put(ONE, contents.get(ONE) + ones);
-        }
-
-        if (twos > 0) {
-            contents.put(TWO, contents.get(TWO) + twos);
-        }
-
-        if (fives > 0) {
-            contents.put(FIVE, contents.get(FIVE) + fives);
-        }
-
-        if (tens > 0) {
-            contents.put(TEN, contents.get(TEN) + tens);
-        }
-
-        if (twenties > 0) {
-            contents.put(TWENTY, contents.get(TWENTY) + twenties);
-        }
+    public void addToContents(Map<String, Integer> deposit) {
+        deposit.forEach((key, value) -> contents.merge(key, value, Integer::sum));
     }
 
-    public void removeContents(int ones, int twos, int fives, int tens, int twenties) throws InsufficientFundsException {
-        if (ones > contents.get(ONE)) {
-            throw new InsufficientFundsException("one");
+    public void removeContents(Map<String, Integer> withdrawal) throws InsufficientFundsException {
+        boolean insufficient = contents.keySet().stream().anyMatch((key) -> withdrawal.get(key) > contents.get(key));
+
+        if (insufficient) {
+            throw new InsufficientFundsException("change");
         }
 
-        if (twos > contents.get(TWO)) {
-            throw new InsufficientFundsException("two");
-        }
-
-        if (fives > contents.get(FIVE)) {
-            throw new InsufficientFundsException("five");
-        }
-
-        if (tens > contents.get(TEN)) {
-            throw new InsufficientFundsException("ten");
-        }
-
-        if (twenties > contents.get(TWENTY)) {
-            throw new InsufficientFundsException("twenty");
-        }
-
-        contents.put(ONE, contents.get(ONE) - ones);
-        contents.put(TWO, contents.get(TWO) - twos);
-        contents.put(FIVE, contents.get(FIVE) - fives);
-        contents.put(TEN, contents.get(TEN) - tens);
-        contents.put(TWENTY, contents.get(TWENTY) - twenties);
+        withdrawal.forEach((key, value) -> contents.merge(key, value, (current, withdraw) -> current - withdraw));
     }
 }
 

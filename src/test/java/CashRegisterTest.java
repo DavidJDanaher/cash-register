@@ -1,11 +1,8 @@
 package test.java;
 import main.java.CashRegister;
-import main.java.excpetions.InsufficientFundsException;
+import main.java.exceptions.InsufficientFundsException;
 
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.DisplayName;
-import org.junit.jupiter.api.Nested;
-import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.*;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -37,10 +34,10 @@ class CashRegisterTest {
         @Test
         @DisplayName("Added Contents")
         void testAddContentsToRegister() {
-            register.addToContents(3, 5, 2, 1, 1);
+            register.addToContents(createCurrencyMap(3, 5, 2, 1, 1));
             assertEquals(createCurrencyMap(3, 5, 2, 1, 1), register.getContents());
 
-            register.addToContents(2, 0, 1, 0, 3);
+            register.addToContents(createCurrencyMap(2, 0, 1, 0, 3));
             assertEquals(createCurrencyMap(5, 5, 3, 1, 4), register.getContents());
         }
     }
@@ -52,8 +49,8 @@ class CashRegisterTest {
         @Test
         @DisplayName("When there are sufficient bills")
         void testRemoveContentsFromRegister_Sufficient() throws InsufficientFundsException {
-            register.addToContents(3, 4, 2, 2, 1);
-            register.removeContents(2, 3, 2, 0, 1);
+            register.addToContents(createCurrencyMap(3, 4, 2, 2, 1));
+            register.removeContents(createCurrencyMap(2, 3, 2, 0, 1));
 
             assertEquals(createCurrencyMap(1, 1, 0, 2, 0), register.getContents());
         }
@@ -61,13 +58,13 @@ class CashRegisterTest {
         @Test
         @DisplayName("When there are insufficient $1 bills")
         void testRemoveContentsFromRegister_InsufficientOnes() {
-            register.addToContents(3, 4, 2, 2, 1);
+            register.addToContents(createCurrencyMap(3, 4, 2, 2, 1));
 
 
             try {
-                register.removeContents(4, 3, 3, 0, 1);
+                register.removeContents(createCurrencyMap(4, 3, 3, 0, 1));
             } catch (InsufficientFundsException e) {
-                assertEquals(new InsufficientFundsException("one").getMessage(), e.getMessage());
+                assertEquals(new InsufficientFundsException("change").getMessage(), e.getMessage());
             }
 
             assertEquals(createCurrencyMap(3, 4, 2, 2, 1), register.getContents());
@@ -76,13 +73,13 @@ class CashRegisterTest {
         @Test
         @DisplayName("When there are insufficient $2 Bills")
         void testRemoveContentsFromRegister_InsufficientTwos() {
-            register.addToContents(3, 4, 2, 2, 1);
+            register.addToContents(createCurrencyMap(3, 4, 2, 2, 1));
 
 
             try {
-                register.removeContents(3, 5, 3, 0, 1);
+                register.removeContents(createCurrencyMap(3, 5, 3, 0, 1));
             } catch (InsufficientFundsException e) {
-                assertEquals(new InsufficientFundsException("two").getMessage(), e.getMessage());
+                assertEquals(new InsufficientFundsException("change").getMessage(), e.getMessage());
             }
 
             assertEquals(createCurrencyMap(3, 4, 2, 2, 1), register.getContents());
@@ -91,13 +88,13 @@ class CashRegisterTest {
         @Test
         @DisplayName("When there are insufficient $5 Bills")
         void testRemoveContentsFromRegister_InsufficientFives() {
-            register.addToContents(3, 4, 2, 2, 1);
+            register.addToContents(createCurrencyMap(3, 4, 2, 2, 1));
 
 
             try {
-                register.removeContents(3, 3, 4, 0, 1);
+                register.removeContents(createCurrencyMap(3, 3, 4, 0, 1));
             } catch (InsufficientFundsException e) {
-                assertEquals(new InsufficientFundsException("five").getMessage(), e.getMessage());
+                assertEquals(new InsufficientFundsException("change").getMessage(), e.getMessage());
             }
 
             assertEquals(createCurrencyMap(3, 4, 2, 2, 1), register.getContents());
@@ -106,13 +103,13 @@ class CashRegisterTest {
         @Test
         @DisplayName("When there are insufficient $10 Bills")
         void testRemoveContentsFromRegister_InsufficientTens() {
-            register.addToContents(3, 4, 2, 2, 1);
+            register.addToContents(createCurrencyMap(3, 4, 2, 2, 1));
 
 
             try {
-                register.removeContents(3, 3, 1, 5, 1);
+                register.removeContents(createCurrencyMap(3, 3, 1, 5, 1));
             } catch (InsufficientFundsException e) {
-                assertEquals(new InsufficientFundsException("ten").getMessage(), e.getMessage());
+                assertEquals(new InsufficientFundsException("change").getMessage(), e.getMessage());
             }
 
             assertEquals(createCurrencyMap(3, 4, 2, 2, 1), register.getContents());
@@ -121,13 +118,13 @@ class CashRegisterTest {
         @Test
         @DisplayName("When there are insufficient $20 Bills")
         void testRemoveContentsFromRegister_InsufficientTwenties() {
-            register.addToContents(3, 4, 2, 2, 0);
+            register.addToContents(createCurrencyMap(3, 4, 2, 2, 0));
 
 
             try {
-                register.removeContents(3, 3, 1, 1, 1);
+                register.removeContents(createCurrencyMap(3, 3, 1, 1, 1));
             } catch (InsufficientFundsException e) {
-                assertEquals(new InsufficientFundsException("twenty").getMessage(), e.getMessage());
+                assertEquals(new InsufficientFundsException("change").getMessage(), e.getMessage());
             }
 
             assertEquals(createCurrencyMap(3, 4, 2, 2, 0), register.getContents());
@@ -146,7 +143,7 @@ class CashRegisterTest {
         @Test
         @DisplayName("Full Register")
         void testGetTotalValue_full() {
-            register.addToContents(3, 2, 4, 3, 6);
+            register.addToContents(createCurrencyMap(3, 2, 4, 3, 6));
             assertEquals(177, register.getTotalValue());
         }
     }
@@ -158,7 +155,7 @@ class CashRegisterTest {
         @Test
         @DisplayName("Insufficient Funds")
         void testGetChange_InsufficientFunds() {
-            register.addToContents(3 ,0, 0, 0, 0);
+            register.addToContents(createCurrencyMap(3 ,0, 0, 0, 0));
 
             try {
                 register.getChange(18);
@@ -172,7 +169,7 @@ class CashRegisterTest {
         @Test
         @DisplayName("Odd change required")
         void testGetChange_OddChangeRequired() {
-            register.addToContents(0, 4, 0, 5, 5);
+            register.addToContents(createCurrencyMap(0, 4, 0, 5, 5));
 
             try {
                 register.getChange(17);
@@ -186,7 +183,7 @@ class CashRegisterTest {
         @Test
         @DisplayName("Ideal case")
         void testGetChange_Ideal() {
-            register.addToContents(2,2,2,2,2);
+            register.addToContents(createCurrencyMap(2,2,2,2,2));
 
             try {
                 register.getChange(58);
@@ -201,7 +198,7 @@ class CashRegisterTest {
             @Test
             @DisplayName("Change of 8 when missing a 1, sufficient 2s")
             void testGetChange_SpecialCase_Eight_AvoidFive() {
-                register.addToContents(0, 4, 1, 0, 0);
+                register.addToContents(createCurrencyMap(0, 4, 1, 0, 0));
                 int initialValue = register.getTotalValue();
                 Map<String, Integer> changeRecieved = new HashMap<>();
 
@@ -215,9 +212,9 @@ class CashRegisterTest {
             }
 
             @Test
-            @DisplayName("Change of 8 with missing 1, insufficient 2s")
+d            @DisplayName("Change of 8 with missing 1, insufficient 2s")
             void testGetChange_SpecialCase_Eight_AvoidFive_Insufficient() {
-                register.addToContents(0, 3, 1, 1, 0);
+                register.addToContents(createCurrencyMap(0, 3, 1, 1, 0));
 
                 try {
                     register.getChange(8);
@@ -236,7 +233,7 @@ class CashRegisterTest {
 
             map1.put("A", 5);
             map2.put("A", 3);
-            map1.forEach((key, value) -> map2.merge(key, value, Integer::sum));
+            map1.forEach((key, value) -> map2.merge(key, value, (a, b) -> a - b));
             System.out.println(map2);
         }
     }

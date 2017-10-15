@@ -1,4 +1,4 @@
-package main.java.excpetions;
+package main.java.exceptions;
 
 public class InsufficientFundsException extends Exception {
     String value;
