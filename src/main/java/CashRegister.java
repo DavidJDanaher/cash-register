@@ -100,7 +100,10 @@ public class CashRegister {
         }
 
         if (changeDue != 0) {
+            change.clear();
             throw new InsufficientFundsException("change");
+        } else {
+//            removeContents();
         }
 
         return change;

@@ -27,7 +27,7 @@ class CashRegisterTest {
         @Test
         @DisplayName("Empty Register")
         void testGetContents() {
-            assertEquals(createRegisterContents(0, 0, 0, 0, 0), register.getContents());
+            assertEquals(createCurrencyMap(0, 0, 0, 0, 0), register.getContents());
         }
     }
 
@@ -38,10 +38,10 @@ class CashRegisterTest {
         @DisplayName("Added Contents")
         void testAddContentsToRegister() {
             register.addToContents(3, 5, 2, 1, 1);
-            assertEquals(createRegisterContents(3, 5, 2, 1, 1), register.getContents());
+            assertEquals(createCurrencyMap(3, 5, 2, 1, 1), register.getContents());
 
             register.addToContents(2, 0, 1, 0, 3);
-            assertEquals(createRegisterContents(5, 5, 3, 1, 4), register.getContents());
+            assertEquals(createCurrencyMap(5, 5, 3, 1, 4), register.getContents());
         }
     }
 
@@ -55,7 +55,7 @@ class CashRegisterTest {
             register.addToContents(3, 4, 2, 2, 1);
             register.removeContents(2, 3, 2, 0, 1);
 
-            assertEquals(createRegisterContents(1, 1, 0, 2, 0), register.getContents());
+            assertEquals(createCurrencyMap(1, 1, 0, 2, 0), register.getContents());
         }
 
         @Test
@@ -70,7 +70,7 @@ class CashRegisterTest {
                 assertEquals(new InsufficientFundsException("one").getMessage(), e.getMessage());
             }
 
-            assertEquals(createRegisterContents(3, 4, 2, 2, 1), register.getContents());
+            assertEquals(createCurrencyMap(3, 4, 2, 2, 1), register.getContents());
         }
 
         @Test
@@ -85,7 +85,7 @@ class CashRegisterTest {
                 assertEquals(new InsufficientFundsException("two").getMessage(), e.getMessage());
             }
 
-            assertEquals(createRegisterContents(3, 4, 2, 2, 1), register.getContents());
+            assertEquals(createCurrencyMap(3, 4, 2, 2, 1), register.getContents());
         }
 
         @Test
@@ -100,7 +100,7 @@ class CashRegisterTest {
                 assertEquals(new InsufficientFundsException("five").getMessage(), e.getMessage());
             }
 
-            assertEquals(createRegisterContents(3, 4, 2, 2, 1), register.getContents());
+            assertEquals(createCurrencyMap(3, 4, 2, 2, 1), register.getContents());
         }
 
         @Test
@@ -115,7 +115,7 @@ class CashRegisterTest {
                 assertEquals(new InsufficientFundsException("ten").getMessage(), e.getMessage());
             }
 
-            assertEquals(createRegisterContents(3, 4, 2, 2, 1), register.getContents());
+            assertEquals(createCurrencyMap(3, 4, 2, 2, 1), register.getContents());
         }
 
         @Test
@@ -130,7 +130,7 @@ class CashRegisterTest {
                 assertEquals(new InsufficientFundsException("twenty").getMessage(), e.getMessage());
             }
 
-            assertEquals(createRegisterContents(3, 4, 2, 2, 0), register.getContents());
+            assertEquals(createCurrencyMap(3, 4, 2, 2, 0), register.getContents());
         }
     }
 
@@ -166,7 +166,7 @@ class CashRegisterTest {
                 assertEquals(new InsufficientFundsException("").getMessage(), e.getMessage());
             }
 
-            assertEquals(createRegisterContents(3, 0, 0, 0, 0), register.getContents());
+            assertEquals(createCurrencyMap(3, 0, 0, 0, 0), register.getContents());
         }
 
         @Test
@@ -180,7 +180,7 @@ class CashRegisterTest {
                 assertEquals(new InsufficientFundsException("change").getMessage(), e.getMessage());
             }
 
-            assertEquals(createRegisterContents(0, 4, 0, 5, 5), register.getContents());
+            assertEquals(createCurrencyMap(0, 4, 0, 5, 5), register.getContents());
         }
 
         @Test
@@ -192,29 +192,56 @@ class CashRegisterTest {
                 register.getChange(58);
             } catch (InsufficientFundsException e) { }
 
-            assertEquals(createRegisterContents(1, 1, 1, 1, 0), register.getContents());
+            assertEquals(createCurrencyMap(1, 1, 1, 1, 0), register.getContents());
         }
 
         @Nested
         @DisplayName("Special cases to consider")
         class EdgeCases {
             @Test
-            @DisplayName("Change of 8 when missing a 1")
+            @DisplayName("Change of 8 when missing a 1, sufficient 2s")
             void testGetChange_SpecialCase_Eight_AvoidFive() {
                 register.addToContents(0, 4, 1, 0, 0);
                 int initialValue = register.getTotalValue();
+                Map<String, Integer> changeRecieved = new HashMap<>();
 
                 try {
-                    register.getChange(8);
+                    changeRecieved = register.getChange(8);
                 } catch (InsufficientFundsException e) {}
 
                 assertEquals(8, initialValue - register.getTotalValue());
-                assertEquals(createRegisterContents(0, 0, 1, 0, 0), register.getContents());
+                assertEquals(createCurrencyMap(0, 4, 0, 0, 0), changeRecieved);
+                assertEquals(createCurrencyMap(0, 0, 1, 0, 0), register.getContents());
             }
+
+            @Test
+            @DisplayName("Change of 8 with missing 1, insufficient 2s")
+            void testGetChange_SpecialCase_Eight_AvoidFive_Insufficient() {
+                register.addToContents(0, 3, 1, 1, 0);
+
+                try {
+                    register.getChange(8);
+                } catch (InsufficientFundsException e) {
+                    assertEquals(new InsufficientFundsException("change").getMessage(), e.getMessage());
+                }
+
+                assertEquals(createCurrencyMap(0, 3, 1, 1, 0), register.getContents());
+            }
+        }
+
+        @Test
+        void testTest() {
+            Map<String, Integer> map1 = new HashMap<>();
+            Map<String, Integer> map2 = new HashMap<>();
+
+            map1.put("A", 5);
+            map2.put("A", 3);
+            map1.forEach((key, value) -> map2.merge(key, value, Integer::sum));
+            System.out.println(map2);
         }
     }
 
-    private Map<String, Integer> createRegisterContents(int ones, int twos, int fives, int tens, int twenties) {
+    private Map<String, Integer> createCurrencyMap(int ones, int twos, int fives, int tens, int twenties) {
         Map<String, Integer> contents = new HashMap<>();
 
         contents.put("ONE", ones);
