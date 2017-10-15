@@ -1,37 +1,36 @@
 package main.java;
 
 import main.java.excpetions.InsufficientFundsException;
+import main.java.resources.DollarValueConstants;
 
 import java.util.HashMap;
 import java.util.Map;
 
 public class CashRegister {
     private Map<String, Integer> contents;
-    private static Map<String, Integer> billValues;
+    private static DollarValueConstants dollars;
+
+    private static String ONE = "ONE";
+    private static String TWO = "TWO";
+    private static String FIVE = "FIVE";
+    private static String TEN = "TEN";
+    private static String TWENTY = "TWENTY";
 
     public CashRegister() {
-        initializeRegister();
-        initializeBillValues();
+        contents = initializeEmptyRegister();
+        dollars = new DollarValueConstants();
     }
 
-    private void initializeRegister() {
-        contents = new HashMap<>();
+    private Map<String,Integer> initializeEmptyRegister() {
+        Map<String,Integer> register = new HashMap<>();
 
-        contents.put("ONE", 0);
-        contents.put("TWO", 0);
-        contents.put("FIVE", 0);
-        contents.put("TEN", 0);
-        contents.put("TWENTY", 0);
-    }
+        register.put(ONE, 0);
+        register.put(TWO, 0);
+        register.put(FIVE, 0);
+        register.put(TEN, 0);
+        register.put(TWENTY, 0);
 
-    private void initializeBillValues() {
-        billValues = new HashMap<>();
-
-        billValues.put("ONE", 1);
-        billValues.put("TWO", 2);
-        billValues.put("FIVE", 5);
-        billValues.put("TEN", 10);
-        billValues.put("TWENTY", 20);
+        return register;
     }
 
     public Map<String, Integer> getContents() {
@@ -49,57 +48,97 @@ public class CashRegister {
     }
 
     private int computeDenominationValue(String bill) {
-        return contents.get(bill) * billValues.get(bill);
+        return contents.get(bill) * dollars.get(bill);
+    }
+
+    public Map<String, Integer> getChange(int changeDue) throws InsufficientFundsException {
+        Map<String, Integer> change = initializeEmptyRegister();
+
+        if (changeDue > getTotalValue()) {
+            throw new InsufficientFundsException("");
+        }
+
+        if (changeDue % 2 != 0 && contents.get(FIVE) == 0 && contents.get(ONE) == 0) {
+            throw new InsufficientFundsException("change");
+        }
+
+        while (changeDue > 0) {
+            if (changeDue >= dollars.TWENTY && contents.get(TWENTY) > 0) {
+                changeDue -= dollars.TWENTY;
+                contents.put(TWENTY, contents.get(TWENTY) - 1);
+                change.put(TWENTY, change.get(TWENTY) + 1);
+            } else if (changeDue >= dollars.TEN && contents.get(TEN) > 0) {
+                changeDue -= dollars.TEN;
+                contents.put(TEN, contents.get(TEN) - 1);
+                change.put(TEN, change.get(TEN) + 1);
+            } else if (changeDue >= dollars.FIVE && contents.get(FIVE) > 0) {
+                changeDue -= dollars.FIVE;
+                contents.put(FIVE, contents.get(FIVE) - 1);
+                change.put(FIVE, change.get(FIVE) + 1);
+            } else if (changeDue >= dollars.TWO && contents.get(TWO) > 0) {
+                changeDue -= dollars.TWO;
+                contents.put(TWO, contents.get(TWO) - 1);
+                change.put(TWO, change.get(TWO) + 1);
+            } else if (changeDue >= dollars.ONE && contents.get(ONE) > 0) {
+                changeDue -= dollars.ONE;
+                contents.put(ONE, contents.get(ONE) - 1);
+                change.put(ONE, change.get(ONE) + 1);
+            } else {
+                throw new InsufficientFundsException("change");
+            }
+        }
+
+        return change;
     }
 
     public void addToContents(int ones, int twos, int fives, int tens, int twenties) {
         if (ones > 0) {
-            contents.put("ONE", contents.get("ONE") + ones);
+            contents.put(ONE, contents.get(ONE) + ones);
         }
 
         if (twos > 0) {
-            contents.put("TWO", contents.get("TWO") + twos);
+            contents.put(TWO, contents.get(TWO) + twos);
         }
 
         if (fives > 0) {
-            contents.put("FIVE", contents.get("FIVE") + fives);
+            contents.put(FIVE, contents.get(FIVE) + fives);
         }
 
         if (tens > 0) {
-            contents.put("TEN", contents.get("TEN") + tens);
+            contents.put(TEN, contents.get(TEN) + tens);
         }
 
         if (twenties > 0) {
-            contents.put("TWENTY", contents.get("TWENTY") + twenties);
+            contents.put(TWENTY, contents.get(TWENTY) + twenties);
         }
     }
 
     public void removeContents(int ones, int twos, int fives, int tens, int twenties) throws InsufficientFundsException {
-        if (ones > contents.get("ONE")) {
+        if (ones > contents.get(ONE)) {
             throw new InsufficientFundsException("one");
         }
 
-        if (twos > contents.get("TWO")) {
+        if (twos > contents.get(TWO)) {
             throw new InsufficientFundsException("two");
         }
 
-        if (fives > contents.get("FIVE")) {
+        if (fives > contents.get(FIVE)) {
             throw new InsufficientFundsException("five");
         }
 
-        if (tens > contents.get("TEN")) {
+        if (tens > contents.get(TEN)) {
             throw new InsufficientFundsException("ten");
         }
 
-        if (twenties > contents.get("TWENTY")) {
+        if (twenties > contents.get(TWENTY)) {
             throw new InsufficientFundsException("twenty");
         }
 
-        contents.put("ONE", contents.get("ONE") - ones);
-        contents.put("TWO", contents.get("TWO") - twos);
-        contents.put("FIVE", contents.get("FIVE") - fives);
-        contents.put("TEN", contents.get("TEN") - tens);
-        contents.put("TWENTY", contents.get("TWENTY") - twenties);
+        contents.put(ONE, contents.get(ONE) - ones);
+        contents.put(TWO, contents.get(TWO) - twos);
+        contents.put(FIVE, contents.get(FIVE) - fives);
+        contents.put(TEN, contents.get(TEN) - tens);
+        contents.put(TWENTY, contents.get(TWENTY) - twenties);
     }
 }
 

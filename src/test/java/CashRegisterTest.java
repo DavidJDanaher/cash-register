@@ -67,7 +67,7 @@ class CashRegisterTest {
             try {
                 register.removeContents(4, 3, 3, 0, 1);
             } catch (InsufficientFundsException e) {
-                assertEquals("There are insufficient one dollar bills.", e.getMessage());
+                assertEquals(new InsufficientFundsException("one").getMessage(), e.getMessage());
             }
 
             assertEquals(createRegisterContents(3, 4, 2, 2, 1), register.getContents());
@@ -82,7 +82,7 @@ class CashRegisterTest {
             try {
                 register.removeContents(3, 5, 3, 0, 1);
             } catch (InsufficientFundsException e) {
-                assertEquals("There are insufficient two dollar bills.", e.getMessage());
+                assertEquals(new InsufficientFundsException("two").getMessage(), e.getMessage());
             }
 
             assertEquals(createRegisterContents(3, 4, 2, 2, 1), register.getContents());
@@ -97,7 +97,7 @@ class CashRegisterTest {
             try {
                 register.removeContents(3, 3, 4, 0, 1);
             } catch (InsufficientFundsException e) {
-                assertEquals("There are insufficient five dollar bills.", e.getMessage());
+                assertEquals(new InsufficientFundsException("five").getMessage(), e.getMessage());
             }
 
             assertEquals(createRegisterContents(3, 4, 2, 2, 1), register.getContents());
@@ -112,7 +112,7 @@ class CashRegisterTest {
             try {
                 register.removeContents(3, 3, 1, 5, 1);
             } catch (InsufficientFundsException e) {
-                assertEquals("There are insufficient ten dollar bills.", e.getMessage());
+                assertEquals(new InsufficientFundsException("ten").getMessage(), e.getMessage());
             }
 
             assertEquals(createRegisterContents(3, 4, 2, 2, 1), register.getContents());
@@ -127,7 +127,7 @@ class CashRegisterTest {
             try {
                 register.removeContents(3, 3, 1, 1, 1);
             } catch (InsufficientFundsException e) {
-                assertEquals("There are insufficient twenty dollar bills.", e.getMessage());
+                assertEquals(new InsufficientFundsException("twenty").getMessage(), e.getMessage());
             }
 
             assertEquals(createRegisterContents(3, 4, 2, 2, 0), register.getContents());
@@ -151,6 +151,68 @@ class CashRegisterTest {
         }
     }
 
+
+    @Nested
+    @DisplayName("Get Change")
+    class TestGetChange {
+        @Test
+        @DisplayName("Insufficient Funds")
+        void testGetChange_InsufficientFunds() {
+            register.addToContents(3 ,0, 0, 0, 0);
+
+            try {
+                register.getChange(18);
+            } catch (InsufficientFundsException e) {
+                assertEquals(new InsufficientFundsException("").getMessage(), e.getMessage());
+            }
+
+            assertEquals(createRegisterContents(3, 0, 0, 0, 0), register.getContents());
+        }
+
+        @Test
+        @DisplayName("Odd change required")
+        void testGetChange_OddChangeRequired() {
+            register.addToContents(0, 4, 0, 5, 5);
+
+            try {
+                register.getChange(17);
+            } catch (InsufficientFundsException e) {
+                assertEquals(new InsufficientFundsException("change").getMessage(), e.getMessage());
+            }
+
+            assertEquals(createRegisterContents(0, 4, 0, 5, 5), register.getContents());
+        }
+
+        @Test
+        @DisplayName("Ideal case")
+        void testGetChange_Ideal() {
+            register.addToContents(2,2,2,2,2);
+
+            try {
+                register.getChange(58);
+            } catch (InsufficientFundsException e) { }
+
+            assertEquals(createRegisterContents(1, 1, 1, 1, 0), register.getContents());
+        }
+
+        @Nested
+        @DisplayName("Special cases to consider")
+        class EdgeCases {
+            @Test
+            @DisplayName("Change of 8 when missing a 1")
+            void testGetChange_SpecialCase_Eight_AvoidFive() {
+                register.addToContents(0, 4, 1, 0, 0);
+                int initialValue = register.getTotalValue();
+
+                try {
+                    register.getChange(8);
+                } catch (InsufficientFundsException e) {}
+
+                assertEquals(8, initialValue - register.getTotalValue());
+                assertEquals(createRegisterContents(0, 0, 1, 0, 0), register.getContents());
+            }
+        }
+    }
 
     private Map<String, Integer> createRegisterContents(int ones, int twos, int fives, int tens, int twenties) {
         Map<String, Integer> contents = new HashMap<>();
