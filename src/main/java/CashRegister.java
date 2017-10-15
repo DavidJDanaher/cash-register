@@ -2,6 +2,7 @@ package main.java;
 
 import main.java.excpetions.InsufficientFundsException;
 import main.java.resources.DollarValueConstants;
+import main.java.resources.RegisterContents;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -9,6 +10,7 @@ import java.util.Map;
 public class CashRegister {
     private Map<String, Integer> contents;
     private static DollarValueConstants dollars;
+    private static RegisterContents count;
 
     private static String ONE = "ONE";
     private static String TWO = "TWO";
@@ -18,6 +20,7 @@ public class CashRegister {
 
     public CashRegister() {
         contents = initializeEmptyRegister();
+        count = new RegisterContents();
         dollars = new DollarValueConstants();
     }
 
@@ -62,30 +65,42 @@ public class CashRegister {
             throw new InsufficientFundsException("change");
         }
 
-        while (changeDue > 0) {
-            if (changeDue >= dollars.TWENTY && contents.get(TWENTY) > 0) {
-                changeDue -= dollars.TWENTY;
-                contents.put(TWENTY, contents.get(TWENTY) - 1);
-                change.put(TWENTY, change.get(TWENTY) + 1);
-            } else if (changeDue >= dollars.TEN && contents.get(TEN) > 0) {
-                changeDue -= dollars.TEN;
-                contents.put(TEN, contents.get(TEN) - 1);
-                change.put(TEN, change.get(TEN) + 1);
-            } else if (changeDue >= dollars.FIVE && contents.get(FIVE) > 0) {
+        while (changeDue >= dollars.TWENTY && contents.get(TWENTY) > 0) {
+            changeDue -= dollars.TWENTY;
+            contents.put(TWENTY, contents.get(TWENTY) - 1);
+            change.put(TWENTY, change.get(TWENTY) + 1);
+        }
+
+        while (changeDue >= dollars.TEN && contents.get(TEN) > 0) {
+            changeDue -= dollars.TEN;
+            contents.put(TEN, contents.get(TEN) - 1);
+            change.put(TEN, change.get(TEN) + 1);
+        }
+
+        while (changeDue >= dollars.FIVE && contents.get(FIVE) > 0) {
+            if (changeDue % 2 == 1 || contents.get(ONE) > 0) {
                 changeDue -= dollars.FIVE;
                 contents.put(FIVE, contents.get(FIVE) - 1);
                 change.put(FIVE, change.get(FIVE) + 1);
-            } else if (changeDue >= dollars.TWO && contents.get(TWO) > 0) {
-                changeDue -= dollars.TWO;
-                contents.put(TWO, contents.get(TWO) - 1);
-                change.put(TWO, change.get(TWO) + 1);
-            } else if (changeDue >= dollars.ONE && contents.get(ONE) > 0) {
-                changeDue -= dollars.ONE;
-                contents.put(ONE, contents.get(ONE) - 1);
-                change.put(ONE, change.get(ONE) + 1);
             } else {
-                throw new InsufficientFundsException("change");
+                break;
             }
+        }
+
+        while (changeDue >= dollars.TWO && contents.get(TWO) > 0) {
+            changeDue -= dollars.TWO;
+            contents.put(TWO, contents.get(TWO) - 1);
+            change.put(TWO, change.get(TWO) + 1);
+        }
+
+        while (changeDue >= dollars.ONE && contents.get(ONE) > 0) {
+            changeDue -= dollars.ONE;
+            contents.put(ONE, contents.get(ONE) - 1);
+            change.put(ONE, change.get(ONE) + 1);
+        }
+
+        if (changeDue != 0) {
+            throw new InsufficientFundsException("change");
         }
 
         return change;
