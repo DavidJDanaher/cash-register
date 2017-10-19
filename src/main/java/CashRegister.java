@@ -2,7 +2,6 @@ package main.java;
 
 import main.java.exceptions.InsufficientFundsException;
 import main.java.resources.DollarValueConstants;
-import main.java.resources.RegisterContents;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -10,7 +9,6 @@ import java.util.Map;
 public class CashRegister {
     private Map<String, Integer> contents;
     private static DollarValueConstants dollars;
-    private static RegisterContents count;
 
     private static String ONE = "ONE";
     private static String TWO = "TWO";
@@ -20,7 +18,6 @@ public class CashRegister {
 
     public CashRegister() {
         contents = initializeEmptyRegister();
-        count = new RegisterContents();
         dollars = new DollarValueConstants();
     }
 
