@@ -56,42 +56,53 @@ public class CashRegister {
 
     public Map<String, Integer> getChange(int changeDue) throws InsufficientFundsException {
         Map<String, Integer> change = initializeEmptyRegister();
+        Map<String, Integer> contentsCopy = new HashMap<>();
+        contentsCopy.putAll(contents);
 
         if (changeDue > getTotalValue()) {
             throw new InsufficientFundsException("");
         }
 
-        if (changeDue % 2 != 0 && contents.get(FIVE) == 0 && contents.get(ONE) == 0) {
+        if (changeDue % 2 != 0 && contentsCopy.get(FIVE) == 0 && contentsCopy.get(ONE) == 0) {
             throw new InsufficientFundsException("change");
         }
 
-        while (changeDue >= dollars.TWENTY && contents.get(TWENTY) > 0) {
+        while (changeDue >= dollars.TWENTY && contentsCopy.get(TWENTY) > 0) {
             changeDue -= dollars.TWENTY;
-            change.put(TWENTY, change.get(TWENTY) + 1);
+            change.merge(TWENTY, 1, Integer::sum);
+            contentsCopy.merge(TWENTY, -1, Integer::sum);
         }
 
-        while (changeDue >= dollars.TEN && contents.get(TEN) > 0) {
-            changeDue -= dollars.TEN;
-            change.put(TEN, change.get(TEN) + 1);
-        }
-
-        while (changeDue >= dollars.FIVE && contents.get(FIVE) > 0) {
-            if (changeDue % 2 == 1 || contents.get(ONE) > 0) {
-                changeDue -= dollars.FIVE;
-                change.put(FIVE, change.get(FIVE) + 1);
+        while (changeDue >= dollars.TEN && contentsCopy.get(TEN) > 0) {
+            if (changeDue >= dollars.TEN + dollars.FIVE || changeDue % 2 == 0 || contentsCopy.get(ONE) > 0) {
+                changeDue -= dollars.TEN;
+                change.merge(TEN, 1, Integer::sum);
+                contentsCopy.merge(TEN, -1, Integer::sum);
             } else {
                 break;
             }
         }
 
-        while (changeDue >= dollars.TWO && contents.get(TWO) > 0) {
-            changeDue -= dollars.TWO;
-            change.put(TWO, change.get(TWO) + 1);
+        while (changeDue >= dollars.FIVE && contentsCopy.get(FIVE) > 0) {
+            if (changeDue % 2 == 1 || contentsCopy.get(ONE) > 0 || contentsCopy.get(FIVE) > 1) {
+                changeDue -= dollars.FIVE;
+                change.merge(FIVE, 1, Integer::sum);
+                contentsCopy.merge(FIVE, -1, Integer::sum);
+            } else {
+                break;
+            }
         }
 
-        while (changeDue >= dollars.ONE && contents.get(ONE) > 0) {
+        while (changeDue >= dollars.TWO && contentsCopy.get(TWO) > 0) {
+            changeDue -= dollars.TWO;
+            change.merge(TWO, 1, Integer::sum);
+            contentsCopy.merge(TWO, -1, Integer::sum);
+        }
+
+        while (changeDue >= dollars.ONE && contentsCopy.get(ONE) > 0) {
             changeDue -= dollars.ONE;
-            change.put(ONE, change.get(ONE) + 1);
+            change.merge(ONE, 1, Integer::sum);
+            contentsCopy.merge(ONE, -1, Integer::sum);
         }
 
         if (changeDue != 0) {

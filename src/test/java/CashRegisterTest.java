@@ -152,6 +152,13 @@ class CashRegisterTest {
     @Nested
     @DisplayName("Get Change")
     class TestGetChange {
+        private Map<String, Integer> changeReceived;
+
+        @BeforeEach
+        public void setup() {
+            changeReceived = new HashMap<>();
+        }
+
         @Test
         @DisplayName("Insufficient Funds")
         void testGetChange_InsufficientFunds() {
@@ -192,27 +199,41 @@ class CashRegisterTest {
             assertEquals(createCurrencyMap(1, 1, 1, 1, 0), register.getContents());
         }
 
+
+        @Test
+        @DisplayName("Insufficient bills are handled by smallern denominations")
+        void testGetChange_Insufficient() {
+            register.addToContents(createCurrencyMap(3, 5, 3, 1, 2));
+
+            try {
+                changeReceived = register.getChange(77);
+            } catch (InsufficientFundsException e) { }
+
+            assertEquals(createCurrencyMap(2, 5, 3, 1, 2), changeReceived);
+            assertEquals(createCurrencyMap(1, 0, 0, 0, 0), register.getContents());
+        }
+
+
         @Nested
-        @DisplayName("Special cases to consider")
-        class EdgeCases {
+        @DisplayName("Even numbers under 10")
+        class SmallEvens {
             @Test
             @DisplayName("Change of 8 when missing a 1, sufficient 2s")
             void testGetChange_SpecialCase_Eight_AvoidFive() {
                 register.addToContents(createCurrencyMap(0, 4, 1, 0, 0));
                 int initialValue = register.getTotalValue();
-                Map<String, Integer> changeRecieved = new HashMap<>();
 
                 try {
-                    changeRecieved = register.getChange(8);
+                    changeReceived = register.getChange(8);
                 } catch (InsufficientFundsException e) {}
 
                 assertEquals(8, initialValue - register.getTotalValue());
-                assertEquals(createCurrencyMap(0, 4, 0, 0, 0), changeRecieved);
+                assertEquals(createCurrencyMap(0, 4, 0, 0, 0), changeReceived);
                 assertEquals(createCurrencyMap(0, 0, 1, 0, 0), register.getContents());
             }
 
             @Test
-d            @DisplayName("Change of 8 with missing 1, insufficient 2s")
+            @DisplayName("Change of 8 with missing 1, insufficient 2s")
             void testGetChange_SpecialCase_Eight_AvoidFive_Insufficient() {
                 register.addToContents(createCurrencyMap(0, 3, 1, 1, 0));
 
@@ -226,15 +247,185 @@ d            @DisplayName("Change of 8 with missing 1, insufficient 2s")
             }
         }
 
-        @Test
-        void testTest() {
-            Map<String, Integer> map1 = new HashMap<>();
-            Map<String, Integer> map2 = new HashMap<>();
+        @Nested
+        @DisplayName("Odd numbers in the teens")
+        class TeenOdds {
+            @Test
+            @DisplayName("Change of 13, sufficient")
+            void testGetChange_SpecialCase_Thirteen() {
+                register.addToContents(createCurrencyMap(1, 4, 3, 1, 1));
+                int initialValue = register.getTotalValue();
 
-            map1.put("A", 5);
-            map2.put("A", 3);
-            map1.forEach((key, value) -> map2.merge(key, value, (a, b) -> a - b));
-            System.out.println(map2);
+                try {
+                    changeReceived = register.getChange(13);
+                } catch (InsufficientFundsException e) {}
+
+                // Change for $13 should be $10 + $2 + $1
+                assertEquals(13, initialValue - register.getTotalValue());
+                assertEquals(createCurrencyMap(1, 1, 0, 1, 0), changeReceived);
+                assertEquals(createCurrencyMap(0, 3, 3, 0, 1), register.getContents());
+            }
+
+            @Test
+            @DisplayName("Change of 13, no 10s, sufficient 1s")
+            void testGetChange_SpecialCase_Thirteen_NoTens() {
+                register.addToContents(createCurrencyMap(1, 4, 3, 0, 1));
+                int initialValue = register.getTotalValue();
+
+                try {
+                    changeReceived = register.getChange(13);
+                } catch (InsufficientFundsException e) {}
+
+                // With no 10s, change for $13 should be $5 x 2 + $2 + $1
+                assertEquals(13, initialValue - register.getTotalValue());
+                assertEquals(createCurrencyMap(1, 1, 2, 0, 0), changeReceived);
+                assertEquals(createCurrencyMap(0, 3, 1, 0, 1), register.getContents());
+            }
+
+            @Test
+            @DisplayName("Change of 13 with no 1s, sufficient 2s")
+            void testGetChange_SpecialCase_Thirteen_AvoidTen_NoOnes() {
+                register.addToContents(createCurrencyMap(0, 4, 2, 1, 1));
+                int initialValue = register.getTotalValue();
+
+                try {
+                    changeReceived = register.getChange(13);
+                } catch (InsufficientFundsException e) {}
+
+                // With no 1s, change for $13 should be $5 + $2 + $2 + $2 + $2
+                assertEquals(13, initialValue - register.getTotalValue());
+                assertEquals(createCurrencyMap(0, 4, 1, 0, 0), changeReceived);
+                assertEquals(createCurrencyMap(0, 0, 1, 1, 1), register.getContents());
+            }
+
+            @Test
+            @DisplayName("Change of 13 with no 1s, insufficient 2s")
+            void testGetChange_SpecialCase_Thirteen_Insufficient() {
+                register.addToContents(createCurrencyMap(0, 2, 2, 1, 1));
+
+                try {
+                    changeReceived = register.getChange(13);
+                } catch (InsufficientFundsException e) {
+                    assertEquals(new InsufficientFundsException("change").getMessage(), e.getMessage());
+                }
+
+                assertEquals(new HashMap<>(), changeReceived);
+                assertEquals(createCurrencyMap(0, 2, 2, 1, 1), register.getContents());
+            }
+        }
+
+        @Nested
+        @DisplayName("Even numbers in the teens")
+        class TeenEvens {
+            @Test
+            @DisplayName("Change of 14 with no 10s, sufficient 1s")
+            void testGetChange_SpecialCase_Fourteen_AvoidTen_OneFive() {
+                register.addToContents(createCurrencyMap(3, 6, 1, 0, 1));
+                int initialValue = register.getTotalValue();
+
+                try {
+                    changeReceived = register.getChange(14);
+                } catch (InsufficientFundsException e) {}
+
+                // With no $10s, change for $14 should be $5 + $2 x 3 + $1
+                assertEquals(14, initialValue - register.getTotalValue());
+                assertEquals(createCurrencyMap(1, 4, 1, 0, 0), changeReceived);
+                assertEquals(createCurrencyMap(2, 2, 0, 0, 1), register.getContents());
+            }
+
+            @Test
+            @DisplayName("Change of 14 with no 10s, no 1s")
+            void testGetChange_SpecialCase_Fourteen_AvoidTen_TwoFives() {
+                register.addToContents(createCurrencyMap(3, 6, 2, 0, 1));
+                int initialValue = register.getTotalValue();
+
+                try {
+                    changeReceived = register.getChange(14);
+                } catch (InsufficientFundsException e) {}
+
+                // With no $10s, change for $14 should be $5 x2 + $2 x 2
+                assertEquals(14, initialValue - register.getTotalValue());
+                assertEquals(createCurrencyMap(0, 2, 2, 0, 0), changeReceived);
+                assertEquals(createCurrencyMap(3, 4, 0, 0, 1), register.getContents());
+            }
+
+            @Test
+            @DisplayName("Change of 14 with no 10s, no 1s, one 5")
+            void testGetChange_SpecialCase_Fourteen_AvoidTen_OneFive_NoOnes() {
+                register.addToContents(createCurrencyMap(0, 10, 1, 0, 1));
+                int initialValue = register.getTotalValue();
+
+                try {
+                    changeReceived = register.getChange(14);
+                } catch (InsufficientFundsException e) {}
+
+                // With no $10s or $1s and only 1 $5, change for $14 should be $2 x 7
+                assertEquals(14, initialValue - register.getTotalValue());
+                assertEquals(createCurrencyMap(0, 7, 0, 0, 0), changeReceived);
+                assertEquals(createCurrencyMap(0, 3, 1, 0, 1), register.getContents());
+            }
+
+            @Test
+            @DisplayName("Change of 14, unable to dispense")
+            void testGetChange_SpecialCase_Fourteen_Insufficent() {
+                register.addToContents(createCurrencyMap(0, 6, 1, 0, 1));
+
+                try {
+                    changeReceived = register.getChange(14);
+                } catch (InsufficientFundsException e) {
+                    assertEquals(new InsufficientFundsException("change").getMessage(), e.getMessage());
+                }
+
+                assertEquals(new HashMap<>(), changeReceived);
+                assertEquals(createCurrencyMap(0, 6, 1, 0, 1), register.getContents());
+            }
+
+            @Test
+            @DisplayName("Change of 18 with no 10s, sufficient 1s")
+            void testGetChange_SpecialCase_Eighteen_AvoidTen() {
+                register.addToContents(createCurrencyMap(1, 4, 3, 0, 1));
+                int initialValue = register.getTotalValue();
+
+                try {
+                    changeReceived = register.getChange(18);
+                } catch (InsufficientFundsException e) {}
+
+                // With no $10s, change for $18 should be $5 x 3 + $2 + $1
+                assertEquals(18, initialValue - register.getTotalValue());
+                assertEquals(createCurrencyMap(1, 1, 3, 0, 0), changeReceived);
+                assertEquals(createCurrencyMap(0, 3, 0, 0, 1), register.getContents());
+            }
+
+            @Test
+            @DisplayName("Change of 18 with no 10s, no 1s")
+            void testGetChange_SpecialCase_Eighteen_AvoidTen_InsufficientOnes() {
+                register.addToContents(createCurrencyMap(0, 4, 3, 0, 1));
+                int initialValue = register.getTotalValue();
+
+                try {
+                    changeReceived = register.getChange(18);
+                } catch (InsufficientFundsException e) {}
+
+                // With no $10s or $1s, change for $18 should be $5 x 2 + $2 x 4
+                assertEquals(18, initialValue - register.getTotalValue());
+                assertEquals(createCurrencyMap(0, 4, 2, 0, 0), changeReceived);
+                assertEquals(createCurrencyMap(0, 0, 1, 0, 1), register.getContents());
+            }
+
+            @Test
+            @DisplayName("Change of 18, unable to dispense")
+            void testGetChange_SpecialCase_Eighteen_Insufficient() {
+                register.addToContents(createCurrencyMap(0, 3, 3, 1, 1));
+
+                try {
+                    changeReceived = register.getChange(18);
+                } catch (InsufficientFundsException e) {
+                    assertEquals(new InsufficientFundsException("change").getMessage(), e.getMessage());
+                }
+
+                assertEquals(new HashMap<>(), changeReceived);
+                assertEquals(createCurrencyMap(0, 3, 3, 1, 1), register.getContents());
+            }
         }
     }
 
