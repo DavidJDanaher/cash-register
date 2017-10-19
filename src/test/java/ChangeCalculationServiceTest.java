@@ -14,7 +14,7 @@ import java.util.Map;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 class ChangeCalculationServiceTest {
-    private Map<String, Integer> changeReceived;
+    private Map<String, Long> changeReceived;
     private ChangeCalculationService changeService;
 
     @BeforeEach
@@ -26,7 +26,7 @@ class ChangeCalculationServiceTest {
     @Test
     @DisplayName("Insufficient Funds")
     void testGetChange_InsufficientFunds() {
-        Map<String, Integer> contents = new RegisterContents(3 ,0, 0, 0, 0).getContents();
+        Map<String, Long> contents = new RegisterContents(3 ,0, 0, 0, 0).getContents();
 
         try {
             changeService.getChange(18, contents);
@@ -40,7 +40,7 @@ class ChangeCalculationServiceTest {
     @Test
     @DisplayName("Odd change, unable to dispense")
     void testGetChange_OddChange_Insufficient() {
-        Map<String, Integer> contents = new RegisterContents(0, 4, 0, 5, 5).getContents();
+        Map<String, Long> contents = new RegisterContents(0, 4, 0, 5, 5).getContents();
 
         try {
             changeService.getChange(17, contents);
@@ -52,9 +52,9 @@ class ChangeCalculationServiceTest {
     }
 
     @Test
-    @DisplayName("Ideal case")
-    void testGetChange_Ideal() {
-        Map<String, Integer> contents = new RegisterContents(2,2,2,2,2).getContents();
+    @DisplayName("Basic case")
+    void testGetChange_Basic() {
+        Map<String, Long> contents = new RegisterContents(2,2,2,2,2).getContents();
 
         try {
            changeReceived = changeService.getChange(58, contents);
@@ -67,7 +67,7 @@ class ChangeCalculationServiceTest {
     @Test
     @DisplayName("Insufficient bills are handled by smallern denominations")
     void testGetChange_Insufficient() {
-        Map<String, Integer> contents = new RegisterContents(3, 5, 3, 1, 2).getContents();
+        Map<String, Long> contents = new RegisterContents(3, 5, 3, 1, 2).getContents();
 
         try {
             changeReceived = changeService.getChange(77, contents);
@@ -83,7 +83,7 @@ class ChangeCalculationServiceTest {
         @Test
         @DisplayName("Change of 8 when missing a 1, sufficient 2s")
         void testGetChange_SpecialCase_Eight_AvoidFive() {
-            Map<String, Integer> contents = new RegisterContents(0, 4, 1, 0, 0).getContents();
+            Map<String, Long> contents = new RegisterContents(0, 4, 1, 0, 0).getContents();
 
             try {
                 changeReceived = changeService.getChange(8, contents);
@@ -95,7 +95,7 @@ class ChangeCalculationServiceTest {
         @Test
         @DisplayName("Change of 8 with missing 1, insufficient 2s")
         void testGetChange_SpecialCase_Eight_AvoidFive_Insufficient() {
-            Map<String, Integer> contents = new RegisterContents(0, 3, 1, 1, 0).getContents();
+            Map<String, Long> contents = new RegisterContents(0, 3, 1, 1, 0).getContents();
 
             try {
                 changeService.getChange(8, contents);
@@ -113,7 +113,7 @@ class ChangeCalculationServiceTest {
         @Test
         @DisplayName("Change of 13, sufficient")
         void testGetChange_SpecialCase_Thirteen() {
-            Map<String, Integer> contents = new RegisterContents(1, 4, 3, 1, 1).getContents();
+            Map<String, Long> contents = new RegisterContents(1, 4, 3, 1, 1).getContents();
 
             try {
                 changeReceived = changeService.getChange(13, contents);
@@ -126,7 +126,7 @@ class ChangeCalculationServiceTest {
         @Test
         @DisplayName("Change of 13, no 10s, sufficient 1s")
         void testGetChange_SpecialCase_Thirteen_NoTens() {
-            Map<String, Integer> contents = new RegisterContents(1, 4, 3, 0, 1).getContents();
+            Map<String, Long> contents = new RegisterContents(1, 4, 3, 0, 1).getContents();
 
             try {
                 changeReceived = changeService.getChange(13, contents);
@@ -139,7 +139,7 @@ class ChangeCalculationServiceTest {
         @Test
         @DisplayName("Change of 13 with no 1s, sufficient 2s")
         void testGetChange_SpecialCase_Thirteen_AvoidTen_NoOnes() {
-            Map<String, Integer> contents = new RegisterContents(0, 4, 2, 1, 1).getContents();
+            Map<String, Long> contents = new RegisterContents(0, 4, 2, 1, 1).getContents();
 
             try {
                 changeReceived = changeService.getChange(13, contents);
@@ -152,7 +152,7 @@ class ChangeCalculationServiceTest {
         @Test
         @DisplayName("Change of 13 with no 1s, insufficient 2s")
         void testGetChange_SpecialCase_Thirteen_Insufficient() {
-            Map<String, Integer> contents = new RegisterContents(0, 2, 2, 1, 1).getContents();
+            Map<String, Long> contents = new RegisterContents(0, 2, 2, 1, 1).getContents();
 
             try {
                 changeReceived = changeService.getChange(13, contents);
@@ -170,7 +170,7 @@ class ChangeCalculationServiceTest {
         @Test
         @DisplayName("Change of 14 with no 10s, sufficient 1s")
         void testGetChange_SpecialCase_Fourteen_AvoidTen_OneFive() {
-            Map<String, Integer> contents = new RegisterContents(3, 6, 1, 0, 1).getContents();
+            Map<String, Long> contents = new RegisterContents(3, 6, 1, 0, 1).getContents();
 
             try {
                 changeReceived = changeService.getChange(14, contents);
@@ -183,7 +183,7 @@ class ChangeCalculationServiceTest {
         @Test
         @DisplayName("Change of 14 with no 10s, no 1s")
         void testGetChange_SpecialCase_Fourteen_AvoidTen_TwoFives() {
-            Map<String, Integer> contents = new RegisterContents(3, 6, 2, 0, 1).getContents();
+            Map<String, Long> contents = new RegisterContents(3, 6, 2, 0, 1).getContents();
 
             try {
                 changeReceived = changeService.getChange(14, contents);
@@ -196,7 +196,7 @@ class ChangeCalculationServiceTest {
         @Test
         @DisplayName("Change of 14 with no 10s, no 1s, one 5")
         void testGetChange_SpecialCase_Fourteen_AvoidTen_OneFive_NoOnes() {
-            Map<String, Integer> contents = new RegisterContents(0, 10, 1, 0, 1).getContents();
+            Map<String, Long> contents = new RegisterContents(0, 10, 1, 0, 1).getContents();
 
             try {
                 changeReceived = changeService.getChange(14, contents);
@@ -209,7 +209,7 @@ class ChangeCalculationServiceTest {
         @Test
         @DisplayName("Change of 14, unable to dispense")
         void testGetChange_SpecialCase_Fourteen_Insufficent() {
-            Map<String, Integer> contents = new RegisterContents(0, 6, 1, 0, 1).getContents();
+            Map<String, Long> contents = new RegisterContents(0, 6, 1, 0, 1).getContents();
 
             try {
                 changeReceived = changeService.getChange(14, contents);
@@ -223,7 +223,7 @@ class ChangeCalculationServiceTest {
         @Test
         @DisplayName("Change of 18 with no 10s, sufficient 1s")
         void testGetChange_SpecialCase_Eighteen_AvoidTen() {
-            Map<String, Integer> contents = new RegisterContents(1, 4, 3, 0, 1).getContents();
+            Map<String, Long> contents = new RegisterContents(1, 4, 3, 0, 1).getContents();
 
             try {
                 changeReceived = changeService.getChange(18, contents);
@@ -236,7 +236,7 @@ class ChangeCalculationServiceTest {
         @Test
         @DisplayName("Change of 18 with no 10s, no 1s")
         void testGetChange_SpecialCase_Eighteen_AvoidTen_InsufficientOnes() {
-            Map<String, Integer> contents = new RegisterContents(0, 4, 3, 0, 1).getContents();
+            Map<String, Long> contents = new RegisterContents(0, 4, 3, 0, 1).getContents();
 
             try {
                 changeReceived = changeService.getChange(18, contents);
@@ -249,7 +249,7 @@ class ChangeCalculationServiceTest {
         @Test
         @DisplayName("Change of 18, unable to dispense")
         void testGetChange_SpecialCase_Eighteen_Insufficient() {
-            Map<String, Integer> contents = new RegisterContents(0, 3, 3, 1, 1).getContents();
+            Map<String, Long> contents = new RegisterContents(0, 3, 3, 1, 1).getContents();
 
             try {
                 changeReceived = changeService.getChange(18, contents);

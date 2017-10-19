@@ -9,19 +9,19 @@ public class RegisterContents {
     private static String FIVE = "FIVE";
     private static String TEN = "TEN";
     private static String TWENTY = "TWENTY";
-    private Map<String,Integer> contents;
+    private Map<String, Long> contents;
 
     public RegisterContents () {
         contents = new HashMap<>();
 
-        contents.put(ONE, 0);
-        contents.put(TWO, 0);
-        contents.put(FIVE, 0);
-        contents.put(TEN, 0);
-        contents.put(TWENTY, 0);
+        contents.put(ONE, (long) 0);
+        contents.put(TWO, (long) 0);
+        contents.put(FIVE, (long) 0);
+        contents.put(TEN, (long) 0);
+        contents.put(TWENTY, (long) 0);
     }
 
-    public RegisterContents(int ones, int twos, int fives, int tens, int twenties) {
+    public RegisterContents(long ones, long twos, long fives, long tens, long twenties) {
         contents = new HashMap<>();
 
         contents.put(ONE, ones);
@@ -31,7 +31,7 @@ public class RegisterContents {
         contents.put(TWENTY, twenties);
     }
 
-    public Map<String, Integer> getContents() {
+    public Map<String, Long> getContents() {
         return contents;
     }
 }
