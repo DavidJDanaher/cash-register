@@ -9,7 +9,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 
 @DisplayName("Cash Register Unit Tests")
 class CashRegisterModelTest {
-    public CashRegisterModel register;
+    private CashRegisterModel register;
 
     @BeforeEach
     void createNewRegister() {

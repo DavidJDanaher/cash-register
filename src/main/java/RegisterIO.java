@@ -15,8 +15,6 @@ public class RegisterIO {
     private Scanner in;
     private String[] DOLLAR_KEYS;
 
-
-
     public RegisterIO() {
         register = new CashRegisterModel();
 
@@ -27,8 +25,6 @@ public class RegisterIO {
         DOLLAR_KEYS[3] = "TWO";
         DOLLAR_KEYS[4] = "ONE";
 
-
-
         try {
             startApplication();
         } catch (IOException e) {
@@ -36,7 +32,7 @@ public class RegisterIO {
         }
     }
 
-    public void startApplication() throws IOException {
+    private void startApplication() throws IOException {
         String inputLine;
         String[] inputs;
 
