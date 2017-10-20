@@ -64,7 +64,7 @@ public class RegisterIO {
                     break;
                 case "change": makeChange(inputs);
                     break;
-                case "default": printHelpMenu();
+                default: printHelpMenu();
                     break;
             }
         }
@@ -143,7 +143,7 @@ public class RegisterIO {
         long twos = Long.parseLong(input[4]);
         long ones = Long.parseLong(input[5]);
 
-        inputMap = new RegisterContents(twenties, tens, fives, twos, ones).getContents();
+        inputMap = new RegisterContents(ones, twos, fives, tens, twenties).getContents();
 
         return inputMap;
     }
