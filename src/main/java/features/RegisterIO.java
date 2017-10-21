@@ -4,7 +4,6 @@ import main.java.resources.exceptions.InsufficientFundsException;
 import main.java.resources.exceptions.InvalidInputException;
 import main.java.resources.RegisterContentsFactory;
 
-import java.util.HashMap;
 import java.util.Map;
 import java.util.Scanner;
 
