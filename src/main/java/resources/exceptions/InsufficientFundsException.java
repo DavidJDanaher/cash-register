@@ -12,7 +12,7 @@ public class InsufficientFundsException extends Exception {
     public String getMessage() {
         String message;
 
-        if (this.value == "change") {
+        if (this.value.equals("change")) {
             message = "This register cannot make that change.";
         } else {
             message = "There are insufficient funds to complete this transaction.";
@@ -20,6 +20,4 @@ public class InsufficientFundsException extends Exception {
 
         return message;
     }
-
-
 }

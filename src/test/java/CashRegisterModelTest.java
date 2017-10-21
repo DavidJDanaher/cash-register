@@ -3,9 +3,14 @@ import main.java.features.CashRegisterModel;
 import main.java.resources.exceptions.InsufficientFundsException;
 
 import main.java.resources.RegisterContentsFactory;
+import main.java.services.ChangeCalculationService;
 import org.junit.jupiter.api.*;
 
+import java.util.Map;
+
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
 
 @DisplayName("Cash Register Unit Tests")
 class CashRegisterModelTest {
@@ -143,6 +148,39 @@ class CashRegisterModelTest {
         void testGetTotalValue_full() {
             register.deposit(new RegisterContentsFactory(3, 2, 4, 3, 6).getContents());
             assertEquals(177, register.getBalance());
+        }
+    }
+
+    @Nested
+    @DisplayName("Make Change")
+    class TestMakeChange {
+        // The use of Mockito here throws a warning, but I've left it because the code isn't doing anything unexpected
+        ChangeCalculationService mockChangeService = mock(ChangeCalculationService.class);
+        CashRegisterModel register = new CashRegisterModel();
+
+        @Test
+        void testMakeChange_Insufficient() {
+            register.deposit(new RegisterContentsFactory(1, 1, 1, 1, 1).getContents());
+
+            try {
+                register.makeChange((long) 40);
+            } catch (InsufficientFundsException e) {
+                assertEquals(new InsufficientFundsException("").getMessage(), e.getMessage());
+            }
+        }
+
+        @Test
+        void testMakeChange_Sufficient() {
+            Map<String, Long> mockChange = new RegisterContentsFactory(1, 1, 1, 1, 1).getContents();
+            register.deposit(new RegisterContentsFactory(3, 3, 3, 3, 3).getContents());
+
+            try {
+                when(mockChangeService.getChange(38, register.getContents())).thenReturn(mockChange);
+                register.makeChange((long) 38);
+
+            } catch (InsufficientFundsException e) { }
+
+            assertEquals(new RegisterContentsFactory(2, 2, 2, 2, 2).getContents(), register.getContents());
         }
     }
 }

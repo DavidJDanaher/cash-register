@@ -8,26 +8,27 @@ import java.util.HashMap;
 import java.util.Map;
 
 public class ChangeCalculationService {
-    private static String ONE = "ONE";
-    private static String TWO = "TWO";
-    private static String FIVE = "FIVE";
-    private static String TEN = "TEN";
-    private static String TWENTY = "TWENTY";
+
+
     private static DollarValueConstants dollars;
 
     public ChangeCalculationService() {
-
         dollars = new DollarValueConstants();
     }
 
     public Map<String, Long> getChange(long changeDue, Map<String, Long> contents) throws InsufficientFundsException {
+        String ONE = "ONE";
+        String TWO = "TWO";
+        String FIVE = "FIVE";
+        String TEN = "TEN";
+        String TWENTY = "TWENTY";
+        //This is done to avoid needing to cast 1 and -1 as a long in each loop.
+        long positiveOne = 1;
+        long negativeOne = -1;
+
         Map<String, Long> change = new RegisterContentsFactory().getContents();
-        Map<String, Long> contentsCopy = new HashMap<>();
+        Map<String, Long> contentsCopy = new RegisterContentsFactory().getContents();
         contentsCopy.putAll(contents);
-//TODO replace functionality
-//        if (changeDue > getBalance()) {
-//            throw new InsufficientFundsException("");
-//        }
 
         if (changeDue % 2 != 0 && contentsCopy.get(FIVE) == 0 && contentsCopy.get(ONE) == 0) {
             throw new InsufficientFundsException("change");
@@ -35,15 +36,15 @@ public class ChangeCalculationService {
 
         while (changeDue >= dollars.TWENTY && contentsCopy.get(TWENTY) > 0) {
             changeDue -= dollars.TWENTY;
-            change.merge(TWENTY, (long) 1, Long::sum);
-            contentsCopy.merge(TWENTY, (long) -1, Long::sum);
+            change.merge(TWENTY, positiveOne, Long::sum);
+            contentsCopy.merge(TWENTY, negativeOne, Long::sum);
         }
 
         while (changeDue >= dollars.TEN && contentsCopy.get(TEN) > 0) {
             if (changeDue >= dollars.TEN + dollars.FIVE || changeDue % 2 == 0 || contentsCopy.get(ONE) > 0) {
                 changeDue -= dollars.TEN;
-                change.merge(TEN, (long) 1, Long::sum);
-                contentsCopy.merge(TEN, (long) -1, Long::sum);
+                change.merge(TEN, positiveOne, Long::sum);
+                contentsCopy.merge(TEN, negativeOne, Long::sum);
             } else {
                 break;
             }
@@ -52,8 +53,8 @@ public class ChangeCalculationService {
         while (changeDue >= dollars.FIVE && contentsCopy.get(FIVE) > 0) {
             if (changeDue % 2 == 1 || contentsCopy.get(ONE) > 0 || contentsCopy.get(FIVE) > 1) {
                 changeDue -= dollars.FIVE;
-                change.merge(FIVE, (long) 1, Long::sum);
-                contentsCopy.merge(FIVE, (long) -1, Long::sum);
+                change.merge(FIVE, positiveOne, Long::sum);
+                contentsCopy.merge(FIVE, negativeOne, Long::sum);
             } else {
                 break;
             }
@@ -61,14 +62,14 @@ public class ChangeCalculationService {
 
         while (changeDue >= dollars.TWO && contentsCopy.get(TWO) > 0) {
             changeDue -= dollars.TWO;
-            change.merge(TWO, (long) 1, Long::sum);
-            contentsCopy.merge(TWO, (long) -1, Long::sum);
+            change.merge(TWO, positiveOne, Long::sum);
+            contentsCopy.merge(TWO, negativeOne, Long::sum);
         }
 
         while (changeDue >= dollars.ONE && contentsCopy.get(ONE) > 0) {
             changeDue -= dollars.ONE;
-            change.merge(ONE, (long) 1, Long::sum);
-            contentsCopy.merge(ONE, (long) -1, Long::sum);
+            change.merge(ONE, positiveOne, Long::sum);
+            contentsCopy.merge(ONE, negativeOne, Long::sum);
         }
 
         if (changeDue != 0) {
