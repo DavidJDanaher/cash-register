@@ -1,6 +1,8 @@
-package main.java.resources;
+package main.java.services;
 
-import main.java.exceptions.InsufficientFundsException;
+import main.java.resources.DollarValueConstants;
+import main.java.resources.RegisterContentsFactory;
+import main.java.resources.exceptions.InsufficientFundsException;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -19,7 +21,7 @@ public class ChangeCalculationService {
     }
 
     public Map<String, Long> getChange(long changeDue, Map<String, Long> contents) throws InsufficientFundsException {
-        Map<String, Long> change = new RegisterContents().getContents();
+        Map<String, Long> change = new RegisterContentsFactory().getContents();
         Map<String, Long> contentsCopy = new HashMap<>();
         contentsCopy.putAll(contents);
 //TODO replace functionality

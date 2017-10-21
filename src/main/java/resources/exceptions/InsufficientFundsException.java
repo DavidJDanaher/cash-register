@@ -1,7 +1,7 @@
-package main.java.exceptions;
+package main.java.resources.exceptions;
 
 public class InsufficientFundsException extends Exception {
-    String value;
+    private String value;
 
     public InsufficientFundsException(String value) {
         super();
@@ -12,13 +12,12 @@ public class InsufficientFundsException extends Exception {
     public String getMessage() {
         String message;
 
-        if (this.value == "") {
-            message = "There are insufficient funds to complete this transaction.";
-        } else if (this.value == "change") {
+        if (this.value == "change") {
             message = "This register cannot make that change.";
         } else {
-            message = String.format("There are insufficient %s dollar bills.", this.value);
+            message = "There are insufficient funds to complete this transaction.";
         }
+
         return message;
     }
 

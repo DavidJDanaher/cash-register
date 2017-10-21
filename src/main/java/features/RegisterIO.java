@@ -1,10 +1,10 @@
-package main.java;
+package main.java.features;
 
-import main.java.exceptions.InsufficientFundsException;
-import main.java.resources.ChangeCalculationService;
-import main.java.resources.RegisterContents;
+import main.java.features.CashRegisterModel;
+import main.java.resources.exceptions.InsufficientFundsException;
+import main.java.services.ChangeCalculationService;
+import main.java.resources.RegisterContentsFactory;
 
-import java.io.*;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Scanner;
@@ -17,6 +17,7 @@ public class RegisterIO {
 
     public RegisterIO() {
         register = new CashRegisterModel();
+        changeService = new ChangeCalculationService();
 
         DOLLAR_KEYS = new String[5];
         DOLLAR_KEYS[0] = "TWENTY";
@@ -25,14 +26,11 @@ public class RegisterIO {
         DOLLAR_KEYS[3] = "TWO";
         DOLLAR_KEYS[4] = "ONE";
 
-        try {
-            startApplication();
-        } catch (IOException e) {
-            System.out.println(e.getMessage());
-        }
+        startApplication();
     }
 
-    private void startApplication() throws IOException {
+
+    private void startApplication() {
         String inputLine;
         String[] inputs;
 
@@ -68,7 +66,7 @@ public class RegisterIO {
         in.close();
     }
 
-    public void printHelpMenu() {
+     private void printHelpMenu() {
         System.out.println("Commands: \n");
         System.out.println("> show \t\t\t\t\t\t| Display register value and inventory");
         System.out.println("> put \t20s 10s 5s 2s 1s \t| Deposit bills, a number for each denomination is required");
@@ -78,12 +76,12 @@ public class RegisterIO {
         System.out.println("> quit \t\t\t\t\t\t| Exit the program");
     }
 
-    public void showRegisterContents() {
+    private void showRegisterContents() {
         System.out.print(String.format("\n$%s ", register.getBalance()));
         Map<String, Long> contents = register.getContents();
 
-        for (int i = 0; i < DOLLAR_KEYS.length; i++) {
-            System.out.print(contents.get(DOLLAR_KEYS[i]) + " ");
+        for (String key : DOLLAR_KEYS) {
+            System.out.print(contents.get(key) + " ");
         }
 
         System.out.print("\n\n");
@@ -99,6 +97,7 @@ public class RegisterIO {
         }
 
         register.deposit(depositValues);
+
         System.out.print("\n");
     }
 
@@ -116,6 +115,7 @@ public class RegisterIO {
         } catch (InsufficientFundsException e) {
             System.out.println(e.getMessage());
         }
+
         System.out.print("\n");
     }
 
@@ -127,6 +127,7 @@ public class RegisterIO {
         } catch (InsufficientFundsException e) {
             System.out.println(e.getMessage());
         }
+
         System.out.print("\n");
     }
 
@@ -139,7 +140,7 @@ public class RegisterIO {
         long twos = Long.parseLong(input[4]);
         long ones = Long.parseLong(input[5]);
 
-        inputMap = new RegisterContents(ones, twos, fives, tens, twenties).getContents();
+        inputMap = new RegisterContentsFactory(ones, twos, fives, tens, twenties).getContents();
 
         return inputMap;
     }

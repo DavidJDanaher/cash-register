@@ -3,7 +3,7 @@ package main.java.resources;
 import java.util.HashMap;
 import java.util.Map;
 
-public class RegisterContents {
+public class RegisterContentsFactory {
     private static String ONE = "ONE";
     private static String TWO = "TWO";
     private static String FIVE = "FIVE";
@@ -11,7 +11,7 @@ public class RegisterContents {
     private static String TWENTY = "TWENTY";
     private Map<String, Long> contents;
 
-    public RegisterContents () {
+    public RegisterContentsFactory() {
         contents = new HashMap<>();
 
         contents.put(ONE, (long) 0);
@@ -21,7 +21,7 @@ public class RegisterContents {
         contents.put(TWENTY, (long) 0);
     }
 
-    public RegisterContents(long ones, long twos, long fives, long tens, long twenties) {
+    public RegisterContentsFactory(long ones, long twos, long fives, long tens, long twenties) {
         contents = new HashMap<>();
 
         contents.put(ONE, ones);

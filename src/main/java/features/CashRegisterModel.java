@@ -1,8 +1,8 @@
-package main.java;
+package main.java.features;
 
-import main.java.exceptions.InsufficientFundsException;
+import main.java.resources.exceptions.InsufficientFundsException;
 import main.java.resources.DollarValueConstants;
-import main.java.resources.RegisterContents;
+import main.java.resources.RegisterContentsFactory;
 
 import java.util.Map;
 
@@ -11,7 +11,7 @@ public class CashRegisterModel {
     private static DollarValueConstants dollars;
 
     public CashRegisterModel() {
-        contents = new RegisterContents().getContents();
+        contents = new RegisterContentsFactory().getContents();
         dollars = new DollarValueConstants();
     }
 
