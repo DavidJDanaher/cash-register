@@ -10,26 +10,14 @@ import java.util.Scanner;
 public class RegisterIO {
     private CashRegisterModel register;
     private Scanner in;
-    private final String[] DOLLAR_KEYS;
+    int[] currencyList;
 
     public RegisterIO() {
-        register = new CashRegisterModel();
+        currencyList = new int[] { 20, 10, 5, 2, 1};
 
-        DOLLAR_KEYS = generateKeyArray();
+        register = new CashRegisterModel(currencyList);
 
         startApplication();
-    }
-
-    private String[] generateKeyArray() {
-        String[] keys = new String[5];
-
-        keys[0] = "TWENTY";
-        keys[1] = "TEN";
-        keys[2] = "FIVE";
-        keys[3] = "TWO";
-        keys[4] = "ONE";
-
-        return keys;
     }
 
     private void startApplication() {
@@ -97,7 +85,7 @@ public class RegisterIO {
 
     private void showRegisterContents() {
         System.out.print(String.format("\n$%s ", register.getBalance()));
-        Map<String, Long> contents = register.getContents();
+        Map<Integer, Long> contents = register.getContents();
 
         print(contents);
     }
@@ -113,7 +101,7 @@ public class RegisterIO {
     }
 
     private void withdrawBills(String[] inputs) {
-        Map<String, Long> withdrawalValues;
+        Map<Integer, Long> withdrawalValues;
 
         try {
             withdrawalValues = mapInput(inputs);
@@ -144,19 +132,21 @@ public class RegisterIO {
         }
     }
 
-    private Map<String, Long> mapInput(String[] input) {
+    private Map<Integer, Long> mapInput(String[] input) {
         String command = input[0];
+        long[] currencyInputs;
 
         try {
-            Map<String, Long> inputMap;
+            Map<Integer, Long> inputMap;
 
             long twenties = Long.parseLong(input[1]);
             long tens = Long.parseLong(input[2]);
             long fives = Long.parseLong(input[3]);
             long twos = Long.parseLong(input[4]);
             long ones = Long.parseLong(input[5]);
+            currencyInputs = new long[] { twenties, tens, fives, twos, ones };
 
-            inputMap = new RegisterContentsFactory(ones, twos, fives, tens, twenties).getContents();
+            inputMap = new RegisterContentsFactory(currencyList, currencyInputs).getContents();
 
             return inputMap;
         } catch (ArrayIndexOutOfBoundsException e) {
@@ -168,8 +158,8 @@ public class RegisterIO {
         System.out.println(e.getMessage());
     }
 
-    private void print(Map<String, Long> value) {
-        for (String key : DOLLAR_KEYS) {
+    private void print(Map<Integer, Long> value) {
+        for (Integer key : value.keySet()) {
             System.out.print(value.get(key) + " ");
         }
 
