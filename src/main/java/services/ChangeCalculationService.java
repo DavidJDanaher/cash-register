@@ -99,25 +99,16 @@ public class ChangeCalculationService {
         return change;
     }
 
-    public Map<Integer, ArrayList<Map<Integer, Integer>>> generatePossibleChangeCombinations(int change, int[] denominations) {
+    public Map<Integer, ArrayList<Map<Integer, Integer>>> generatePossibleChangeCombinations(int change, int[] denominations, Map<Integer, Integer> contents) {
         Map<Integer, ArrayList<Map<Integer, Integer>>> allCombinations = new HashMap<>();
         ArrayList<Map<Integer, Integer>> combinationsOfValue;
-        Map<Integer, Integer> emptyMap = new HashMap<>();
+        Map<Integer, Integer> emptyMap = new RegisterContentsFactory(denominations).getContents();
         Map<Integer, Integer> singlePermutation;
-
-        long startTime;
-        long difference;
-
-        for (int key : denominations) {
-            emptyMap.put(key, 0);
-        }
-
 
         int denominationIndex = 0;
 
         for (int i = 1; i <= change; i++) {
             combinationsOfValue = new ArrayList<>();
-
 
             if (i == denominations[denominationIndex]) {
                 singlePermutation = new HashMap<>(emptyMap);
@@ -128,21 +119,18 @@ public class ChangeCalculationService {
             }
 
             for (int j = i - 1; j >= i - j; j--) {
-                combinationsOfValue = mergeAll(allCombinations.get(j), allCombinations.get(i - j), combinationsOfValue);
+                combinationsOfValue = mergeAll(allCombinations.get(j), allCombinations.get(i - j), combinationsOfValue, contents);
             }
 
-            startTime = System.currentTimeMillis();
             Collections.sort(combinationsOfValue, new DescendingDenomValue());
 
-            difference =  System.currentTimeMillis() - startTime;
-            System.out.println(String.format("Difference in ms for %s case: %s", i, difference));
             allCombinations.put(i, combinationsOfValue);
         }
 
         return allCombinations;
     }
 
-    private ArrayList<Map<Integer, Integer>> mergeAll(ArrayList<Map<Integer, Integer>> list1, ArrayList<Map<Integer, Integer>> list2, ArrayList<Map<Integer, Integer>> masterList) {
+    private ArrayList<Map<Integer, Integer>> mergeAll(ArrayList<Map<Integer, Integer>> list1, ArrayList<Map<Integer, Integer>> list2, ArrayList<Map<Integer, Integer>> masterList, Map<Integer, Integer> registerContents) {
 
         for (int i = 0; i < list1.size(); i++) {
             for (int j = 0; j < list2.size(); j++) {
@@ -151,7 +139,7 @@ public class ChangeCalculationService {
 
                 list2.get(j).forEach((key, value) -> mergedMap.merge(key, value, Integer::sum));
 
-                if (!masterList.contains(mergedMap)) {
+                if (!masterList.contains(mergedMap) && !insufficientFundsCheck(mergedMap, registerContents)) {
                     masterList.add(mergedMap);
                 }
             }
@@ -174,5 +162,9 @@ public class ChangeCalculationService {
 
             return difference;
         }
+    }
+
+    private boolean insufficientFundsCheck(Map<Integer, Integer> changeCandidate, Map<Integer, Integer> contents) {
+        return contents.keySet().stream().anyMatch((key) -> changeCandidate.get(key) > contents.get(key));
     }
 }

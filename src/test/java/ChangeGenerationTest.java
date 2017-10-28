@@ -1,5 +1,6 @@
 package test.java;
 
+import main.java.resources.RegisterContentsFactory;
 import main.java.services.ChangeCalculationService;
 import org.junit.jupiter.api.*;
 
@@ -15,6 +16,7 @@ class ChangeGenerationTest {
 
     ChangeCalculationService service = new ChangeCalculationService();
     static int[] standardDenominations = new int[] { 1, 2, 5, 10, 20 };
+    static Map<Integer, Integer> sufficientRegister = new RegisterContentsFactory(standardDenominations, new int[] { 9, 9, 9, 9, 9}).getContents();
     static Map<Integer, ArrayList<Map<Integer, Integer>>> allCombinationsExpected = new HashMap<>();
     Map<Integer, ArrayList<Map<Integer, Integer>>> allCombinationsActual;
 
@@ -48,7 +50,7 @@ class ChangeGenerationTest {
         combosForOne.add(singlePermutation);
         allCombinationsExpected.put(1, combosForOne);
 
-        allCombinationsActual = service.generatePossibleChangeCombinations(1, standardDenominations);
+        allCombinationsActual = service.generatePossibleChangeCombinations(1, standardDenominations, sufficientRegister);
         
         assertEquals(allCombinationsActual.get(1), allCombinationsExpected.get(1));
     }
@@ -67,7 +69,7 @@ class ChangeGenerationTest {
 
         allCombinationsExpected.put(2, permutationsTwo);
 
-        allCombinationsActual = service.generatePossibleChangeCombinations(2, standardDenominations);
+        allCombinationsActual = service.generatePossibleChangeCombinations(2, standardDenominations, sufficientRegister);
 
         assertEquals(allCombinationsExpected.get(2), allCombinationsActual.get(2));
     }
@@ -87,7 +89,7 @@ class ChangeGenerationTest {
 
         allCombinationsExpected.put(3, permutationsThree);
 
-        allCombinationsActual = service.generatePossibleChangeCombinations(3, standardDenominations);
+        allCombinationsActual = service.generatePossibleChangeCombinations(3, standardDenominations, sufficientRegister);
 
         assertEquals(allCombinationsExpected.get(3), allCombinationsActual.get(3));
     }
@@ -113,7 +115,7 @@ class ChangeGenerationTest {
 
         allCombinationsExpected.put(4, permutationsFour);
 
-        allCombinationsActual = service.generatePossibleChangeCombinations(4, standardDenominations);
+        allCombinationsActual = service.generatePossibleChangeCombinations(4, standardDenominations, sufficientRegister);
 
         assertEquals(allCombinationsExpected.get(4), allCombinationsActual.get(4));
     }
@@ -143,7 +145,7 @@ class ChangeGenerationTest {
 
         allCombinationsExpected.put(5, permutationsFive);
 
-        allCombinationsActual = service.generatePossibleChangeCombinations(5, standardDenominations);
+        allCombinationsActual = service.generatePossibleChangeCombinations(5, standardDenominations, sufficientRegister);
 
         assertEquals(allCombinationsExpected.get(5), allCombinationsActual.get(5));
     }
@@ -178,7 +180,7 @@ class ChangeGenerationTest {
 
         allCombinationsExpected.put(6, permutationsSix);
 
-        allCombinationsActual = service.generatePossibleChangeCombinations(6, standardDenominations);
+        allCombinationsActual = service.generatePossibleChangeCombinations(6, standardDenominations, sufficientRegister);
 
         assertEquals(allCombinationsExpected.get(6), allCombinationsActual.get(6));
     }
@@ -253,18 +255,9 @@ class ChangeGenerationTest {
 //
 //        allCombinationsExpected.put(6, permutationsTwenty);
 //
-//        allCombinationsActual = service.generatePossibleChangeCombinations(6, standardDenominations);
+//        allCombinationsActual = service.generatePossibleChangeCombinations(6, standardDenominations, sufficientRegister);
 //
 //        assertEquals(allCombinationsExpected.get(6), allCombinationsActual.get(6));
 //    }
 
-
-    @Test
-    void testJava() {
-    Map<Integer, Integer> test = new HashMap<>();
-        test.put(2, 5);
-
-        assertFalse(test.containsKey(1));
-        assertTrue(test.containsKey(2));
-    }
 }
