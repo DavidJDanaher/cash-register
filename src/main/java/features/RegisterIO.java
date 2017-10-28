@@ -85,7 +85,7 @@ public class RegisterIO {
 
     private void showRegisterContents() {
         System.out.print(String.format("\n$%s ", register.getBalance()));
-        Map<Integer, Long> contents = register.getContents();
+        Map<Integer, Integer> contents = register.getContents();
 
         print(contents);
     }
@@ -101,7 +101,7 @@ public class RegisterIO {
     }
 
     private void withdrawBills(String[] inputs) {
-        Map<Integer, Long> withdrawalValues;
+        Map<Integer, Integer> withdrawalValues;
 
         try {
             withdrawalValues = mapInput(inputs);
@@ -120,7 +120,7 @@ public class RegisterIO {
 
     private void makeChange(String[] inputs) {
         try {
-            long value = Long.parseLong(inputs[1]);
+            int value = Integer.parseInt(inputs[1]);
 
             try {
                 print(register.makeChange(value));
@@ -132,19 +132,19 @@ public class RegisterIO {
         }
     }
 
-    private Map<Integer, Long> mapInput(String[] input) {
+    private Map<Integer, Integer> mapInput(String[] input) {
         String command = input[0];
-        long[] currencyInputs;
+        int[] currencyInputs;
 
         try {
-            Map<Integer, Long> inputMap;
+            Map<Integer, Integer> inputMap;
 
-            long twenties = Long.parseLong(input[1]);
-            long tens = Long.parseLong(input[2]);
-            long fives = Long.parseLong(input[3]);
-            long twos = Long.parseLong(input[4]);
-            long ones = Long.parseLong(input[5]);
-            currencyInputs = new long[] { twenties, tens, fives, twos, ones };
+            int twenties = Integer.parseInt(input[1]);
+            int tens = Integer.parseInt(input[2]);
+            int fives = Integer.parseInt(input[3]);
+            int twos = Integer.parseInt(input[4]);
+            int ones = Integer.parseInt(input[5]);
+            currencyInputs = new int[] { twenties, tens, fives, twos, ones };
 
             inputMap = new RegisterContentsFactory(currencyList, currencyInputs).getContents();
 
@@ -158,7 +158,7 @@ public class RegisterIO {
         System.out.println(e.getMessage());
     }
 
-    private void print(Map<Integer, Long> value) {
+    private void print(Map<Integer, Integer> value) {
         for (Integer key : value.keySet()) {
             System.out.print(value.get(key) + " ");
         }

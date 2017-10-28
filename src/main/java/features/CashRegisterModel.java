@@ -7,7 +7,7 @@ import main.java.services.ChangeCalculationService;
 import java.util.Map;
 
 public class CashRegisterModel {
-    private Map<Integer, Long> contents;
+    private Map<Integer, Integer> contents;
     private ChangeCalculationService changeService;
 
     public CashRegisterModel(int[] denominations) {
@@ -15,12 +15,12 @@ public class CashRegisterModel {
         changeService = new ChangeCalculationService();
     }
 
-    public Map<Integer, Long> getContents() {
+    public Map<Integer, Integer> getContents() {
         return contents;
     }
 
-    public long getBalance() {
-        long value = 0;
+    public int getBalance() {
+        int value = 0;
 
         for(Integer key: contents.keySet()) {
             value += computeDenominationValue(key);
@@ -29,15 +29,15 @@ public class CashRegisterModel {
         return value;
     }
 
-    private long computeDenominationValue(int bill) {
+    private int computeDenominationValue(int bill) {
         return contents.get(bill) * bill;
     }
 
-    public void deposit(Map<Integer, Long> deposit) {
-        deposit.forEach((key, value) -> contents.merge(key, value, Long::sum));
+    public void deposit(Map<Integer, Integer> deposit) {
+        deposit.forEach((key, value) -> contents.merge(key, value, Integer::sum));
     }
 
-    public void withdraw(Map<Integer, Long> withdrawal) throws InsufficientFundsException {
+    public void withdraw(Map<Integer, Integer> withdrawal) throws InsufficientFundsException {
         boolean insufficient = contents.keySet().stream().anyMatch((key) -> withdrawal.get(key) > contents.get(key));
 
         if (insufficient) {
@@ -47,8 +47,8 @@ public class CashRegisterModel {
         withdrawal.forEach((key, value) -> contents.merge(key, value, (current, withdraw) -> current - withdraw));
     }
 
-    public Map<Integer, Long> makeChange (Long changeRequested) throws InsufficientFundsException {
-        Map<Integer, Long> change;
+    public Map<Integer, Integer> makeChange (Integer changeRequested) throws InsufficientFundsException {
+        Map<Integer, Integer> change;
 
         if (changeRequested > getBalance()) {
             throw new InsufficientFundsException("");

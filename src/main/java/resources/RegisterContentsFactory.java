@@ -4,17 +4,17 @@ import java.util.HashMap;
 import java.util.Map;
 
 public class RegisterContentsFactory {
-    private Map<Integer, Long> contents;
+    private Map<Integer, Integer> contents;
 
     public RegisterContentsFactory(int[] denominations) {
         contents = new HashMap<>();
 
         for (int value : denominations) {
-            contents.put(value, (long) 0);
+            contents.put(value, 0);
         }
     }
 
-    public RegisterContentsFactory(int[] denominations, long[] initialValues) {
+    public RegisterContentsFactory(int[] denominations, int[] initialValues) {
         contents = new HashMap<>();
 
         for (int i = 0; i < denominations.length; i++) {
@@ -22,7 +22,7 @@ public class RegisterContentsFactory {
         }
     }
 
-    public Map<Integer, Long> getContents() {
+    public Map<Integer, Integer> getContents() {
         return contents;
     }
 }

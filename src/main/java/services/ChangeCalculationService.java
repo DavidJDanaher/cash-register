@@ -3,17 +3,17 @@ package main.java.services;
 import main.java.resources.RegisterContentsFactory;
 import main.java.resources.exceptions.InsufficientFundsException;
 
-import java.util.Map;
+import java.util.*;
 
 public class ChangeCalculationService {
 
     public ChangeCalculationService() {
     }
 
-    public Map<Integer, Long> getChange(long changeDue, Map<Integer, Long> contents) throws InsufficientFundsException {
-        //This is done to avoid needing to cast 1 and -1 as a long in each loop.
-        long positiveOne = 1;
-        long negativeOne = -1;
+    public Map<Integer, Integer> getChange(int changeDue, Map<Integer, Integer> contents) throws InsufficientFundsException {
+        //This is done to avoid needing to cast 1 and -1 as a int in each loop.
+        int positiveOne = 1;
+        int negativeOne = -1;
         int arrSize = contents.size();
         int[] keys = new int[arrSize];
 
@@ -23,8 +23,8 @@ public class ChangeCalculationService {
             keys[i] = arr[i].intValue();
         }
 
-        Map<Integer, Long> change = new RegisterContentsFactory(keys).getContents();
-        Map<Integer, Long> contentsCopy = new RegisterContentsFactory(keys).getContents();
+        Map<Integer, Integer> change = new RegisterContentsFactory(keys).getContents();
+        Map<Integer, Integer> contentsCopy = new RegisterContentsFactory(keys).getContents();
         contentsCopy.putAll(contents);
 
         if (changeDue % 2 != 0 && contentsCopy.get(5) == 0 && contentsCopy.get(1) == 0) {
@@ -33,15 +33,15 @@ public class ChangeCalculationService {
 
         while (changeDue >= 20 && contentsCopy.get(20) > 0) {
             changeDue -= 20;
-            change.merge(20, positiveOne, Long::sum);
-            contentsCopy.merge(20, negativeOne, Long::sum);
+            change.merge(20, positiveOne, Integer::sum);
+            contentsCopy.merge(20, negativeOne, Integer::sum);
         }
 
         while (changeDue >= 10 && contentsCopy.get(10) > 0) {
             if (changeDue >= 10 + 5 || changeDue % 2 == 0 || contentsCopy.get(1) > 0) {
                 changeDue -= 10;
-                change.merge(10, positiveOne, Long::sum);
-                contentsCopy.merge(10, negativeOne, Long::sum);
+                change.merge(10, positiveOne, Integer::sum);
+                contentsCopy.merge(10, negativeOne, Integer::sum);
             } else {
                 break;
             }
@@ -50,8 +50,8 @@ public class ChangeCalculationService {
         while (changeDue >= 5 && contentsCopy.get(5) > 0) {
             if (changeDue % 2 == 1 || contentsCopy.get(1) > 0 || contentsCopy.get(5) > 1) {
                 changeDue -= 5;
-                change.merge(5, positiveOne, Long::sum);
-                contentsCopy.merge(5, negativeOne, Long::sum);
+                change.merge(5, positiveOne, Integer::sum);
+                contentsCopy.merge(5, negativeOne, Integer::sum);
             } else {
                 break;
             }
@@ -59,14 +59,14 @@ public class ChangeCalculationService {
 
         while (changeDue >= 2 && contentsCopy.get(2) > 0) {
             changeDue -= 2;
-            change.merge(2, positiveOne, Long::sum);
-            contentsCopy.merge(2, negativeOne, Long::sum);
+            change.merge(2, positiveOne, Integer::sum);
+            contentsCopy.merge(2, negativeOne, Integer::sum);
         }
 
         while (changeDue >= 1 && contentsCopy.get(1) > 0) {
             changeDue -= 1;
-            change.merge(1, positiveOne, Long::sum);
-            contentsCopy.merge(1, negativeOne, Long::sum);
+            change.merge(1, positiveOne, Integer::sum);
+            contentsCopy.merge(1, negativeOne, Integer::sum);
         }
 
         if (changeDue != 0) {
@@ -75,5 +75,104 @@ public class ChangeCalculationService {
         }
 
         return change;
+    }
+
+    public Map<Integer, Integer> makeChange(int changeDue, Map<Integer, Integer> contents) {
+        int arrSize = contents.size();
+        int[] keys = new int[arrSize];
+
+        Integer[] arr = contents.keySet().toArray(new Integer[arrSize]);
+
+        Arrays.sort(arr);
+
+
+        for(int i = 0; i < arrSize; i++) {
+            keys[i] = arr[i].intValue();
+        }
+
+        Map<Integer, Integer> change = new RegisterContentsFactory(keys).getContents();
+
+
+
+
+
+        return change;
+    }
+
+    public Map<Integer, ArrayList<Map<Integer, Integer>>> generatePossibleChangeCombinations(int change, int[] denominations) {
+        Map<Integer, ArrayList<Map<Integer, Integer>>> allCombinations = new HashMap<>();
+        ArrayList<Map<Integer, Integer>> combinationsOfValue;
+        Map<Integer, Integer> emptyMap = new HashMap<>();
+        Map<Integer, Integer> singlePermutation;
+
+        long startTime;
+        long difference;
+
+        for (int key : denominations) {
+            emptyMap.put(key, 0);
+        }
+
+
+        int denominationIndex = 0;
+
+        for (int i = 1; i <= change; i++) {
+            combinationsOfValue = new ArrayList<>();
+
+
+            if (i == denominations[denominationIndex]) {
+                singlePermutation = new HashMap<>(emptyMap);
+                singlePermutation.put(i, 1);
+
+                combinationsOfValue.add(singlePermutation);
+                denominationIndex++;
+            }
+
+            for (int j = i - 1; j >= i - j; j--) {
+                combinationsOfValue = mergeAll(allCombinations.get(j), allCombinations.get(i - j), combinationsOfValue);
+            }
+
+            startTime = System.currentTimeMillis();
+            Collections.sort(combinationsOfValue, new DescendingDenomValue());
+
+            difference =  System.currentTimeMillis() - startTime;
+            System.out.println(String.format("Difference in ms for %s case: %s", i, difference));
+            allCombinations.put(i, combinationsOfValue);
+        }
+
+        return allCombinations;
+    }
+
+    private ArrayList<Map<Integer, Integer>> mergeAll(ArrayList<Map<Integer, Integer>> list1, ArrayList<Map<Integer, Integer>> list2, ArrayList<Map<Integer, Integer>> masterList) {
+
+        for (int i = 0; i < list1.size(); i++) {
+            for (int j = 0; j < list2.size(); j++) {
+                Map<Integer, Integer> mergedMap = new HashMap<>();
+                mergedMap.putAll(list1.get(i));
+
+                list2.get(j).forEach((key, value) -> mergedMap.merge(key, value, Integer::sum));
+
+                if (!masterList.contains(mergedMap)) {
+                    masterList.add(mergedMap);
+                }
+            }
+        }
+
+        return masterList;
+    }
+
+    class DescendingDenomValue implements Comparator<Map<Integer, Integer>> {
+        int[] standardDenominations = new int[] { 1, 2, 5, 10, 20 };
+        int difference = 0;
+
+        public int compare(Map<Integer, Integer> map1, Map<Integer, Integer> map2) {
+            for (int i = standardDenominations[standardDenominations.length - 1]; i >= 0; i--) {
+                if (!(map1.get(i) == map2.get(i))) {
+                    difference = map2.get(i) - map1.get(i);
+                    break;
+                }
+            }
+
+            return difference;
+        }
     }
 }

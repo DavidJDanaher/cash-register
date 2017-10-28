@@ -163,7 +163,7 @@ class CashRegisterModelTest {
             register.deposit(currencyMap( 1, 1, 1, 1, 1 ));
 
             try {
-                register.makeChange((long) 40);
+                register.makeChange( 40);
             } catch (InsufficientFundsException e) {
                 assertEquals(new InsufficientFundsException("").getMessage(), e.getMessage());
             }
@@ -171,12 +171,12 @@ class CashRegisterModelTest {
 
         @Test
         void testMakeChange_Sufficient() {
-            Map<Integer, Long> mockChange = currencyMap(1, 1,1, 1,1);
+            Map<Integer, Integer> mockChange = currencyMap(1, 1,1, 1,1);
             register.deposit(currencyMap(3, 3, 3, 3, 3 ));
 
             try {
                 when(mockChangeService.getChange(38, register.getContents())).thenReturn(mockChange);
-                register.makeChange((long) 38);
+                register.makeChange( 38);
 
             } catch (InsufficientFundsException e) { }
 
@@ -184,8 +184,8 @@ class CashRegisterModelTest {
         }
     }
 
-    private Map<Integer, Long> currencyMap(long ones, long twos, long fives, long tens, long twenties) {
-        return new RegisterContentsFactory(new int[] { 1, 2, 5, 10, 20 }, new long[] { ones, twos, fives, tens, twenties }).getContents();
+    private Map<Integer, Integer> currencyMap(int ones, int twos, int fives, int tens, int twenties) {
+        return new RegisterContentsFactory(new int[] { 1, 2, 5, 10, 20 }, new int[] { ones, twos, fives, tens, twenties }).getContents();
     }
 }
 
