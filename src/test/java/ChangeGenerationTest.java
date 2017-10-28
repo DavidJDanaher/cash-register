@@ -129,7 +129,7 @@ class ChangeGenerationTest {
 
         perm_0_0_1_0_0.put(5, 1);
         permutationsFive.add(perm_0_0_1_0_0);
-        
+
         perm_1_2_0_0_0.put(2, 2);
         perm_1_2_0_0_0.put(1, 1);
         permutationsFive.add(perm_1_2_0_0_0);
@@ -147,6 +147,117 @@ class ChangeGenerationTest {
 
         assertEquals(allCombinationsExpected.get(5), allCombinationsActual.get(5));
     }
+
+    @Test
+    @DisplayName("Six")
+    void testSix() {
+        ArrayList<Map<Integer, Integer>> permutationsSix = new ArrayList<>();
+        Map<Integer, Integer> perm_1_0_1_0_0 = new HashMap<>(emptyMap);
+        Map<Integer, Integer> perm_0_3_0_0_0 = new HashMap<>(emptyMap);
+        Map<Integer, Integer> perm_2_2_0_0_0 = new HashMap<>(emptyMap);
+        Map<Integer, Integer> perm_4_1_0_0_0 = new HashMap<>(emptyMap);
+        Map<Integer, Integer> perm_6_0_0_0_0 = new HashMap<>(emptyMap);
+
+        perm_1_0_1_0_0.put(5, 1);
+        perm_1_0_1_0_0.put(1, 1);
+        permutationsSix.add(perm_1_0_1_0_0);
+
+        perm_0_3_0_0_0.put(2, 3);
+        permutationsSix.add(perm_0_3_0_0_0);
+
+        perm_2_2_0_0_0.put(1, 2);
+        perm_2_2_0_0_0.put(2, 2);
+        permutationsSix.add(perm_2_2_0_0_0);
+
+        perm_4_1_0_0_0.put(1, 4);
+        perm_4_1_0_0_0.put(2, 1);
+        permutationsSix.add(perm_4_1_0_0_0);
+
+        perm_6_0_0_0_0.put(1, 6);
+        permutationsSix.add(perm_6_0_0_0_0);
+
+        allCombinationsExpected.put(6, permutationsSix);
+
+        allCombinationsActual = service.generatePossibleChangeCombinations(6, standardDenominations);
+
+        assertEquals(allCombinationsExpected.get(6), allCombinationsActual.get(6));
+    }
+
+//    @Test
+//    @DisplayName("A giant test for twenty")
+//    void testTwenty() {
+//        ArrayList<Map<Integer, Integer>> permutationsTwenty = new ArrayList<>();
+//        Map<Integer, Integer> perm_0_0_0_0_1 = new HashMap<>(emptyMap);
+//        Map<Integer, Integer> perm_0_0_0_2_0 = new HashMap<>(emptyMap);
+//
+//        Map<Integer, Integer> perm_0_0_2_1_0 = new HashMap<>(emptyMap);
+//        Map<Integer, Integer> perm_1_2_1_1_0 = new HashMap<>(emptyMap);
+//        Map<Integer, Integer> perm_3_1_1_1_0 = new HashMap<>(emptyMap);
+//        Map<Integer, Integer> perm_5_0_1_1_0 = new HashMap<>(emptyMap);
+//        Map<Integer, Integer> perm_0_5_0_1_0 = new HashMap<>(emptyMap);
+//        Map<Integer, Integer> perm_2_4_0_1_0 = new HashMap<>(emptyMap);
+//        Map<Integer, Integer> perm_4_3_0_1_0 = new HashMap<>(emptyMap);
+//        Map<Integer, Integer> perm_6_2_0_1_0 = new HashMap<>(emptyMap);
+//        Map<Integer, Integer> perm_8_1_0_1_0 = new HashMap<>(emptyMap);
+//        Map<Integer, Integer> perm_10_0_0_1_0 = new HashMap<>(emptyMap);
+//
+//        Map<Integer, Integer> perm_0_0_4_0_0 = new HashMap<>(emptyMap);
+//
+//        Map<Integer, Integer> perm_1_2_3_0_0 = new HashMap<>(emptyMap);
+//        Map<Integer, Integer> perm_3_1_3_0_0 = new HashMap<>(emptyMap);
+//        Map<Integer, Integer> perm_5_0_3_0_0 = new HashMap<>(emptyMap);
+//
+//        Map<Integer, Integer> perm_0_5_2_0_0 = new HashMap<>(emptyMap);
+//        Map<Integer, Integer> perm_2_4_2_0_0 = new HashMap<>(emptyMap);
+//        Map<Integer, Integer> perm_4_3_2_0_0 = new HashMap<>(emptyMap);
+//        Map<Integer, Integer> perm_6_2_2_0_0 = new HashMap<>(emptyMap);
+//        Map<Integer, Integer> perm_8_1_2_0_0 = new HashMap<>(emptyMap);
+//        Map<Integer, Integer> perm_10_0_2_0_0 = new HashMap<>(emptyMap);
+//
+//        Map<Integer, Integer> perm_1_7_1_0_0 = new HashMap<>(emptyMap);
+//        Map<Integer, Integer> perm_3_6_1_0_0 = new HashMap<>(emptyMap);
+//        Map<Integer, Integer> perm_5_5_1_0_0 = new HashMap<>(emptyMap);
+//        Map<Integer, Integer> perm_7_4_1_0_0 = new HashMap<>(emptyMap);
+//        Map<Integer, Integer> perm_9_3_1_0_0 = new HashMap<>(emptyMap);
+//        Map<Integer, Integer> perm_11_2_1_0_0 = new HashMap<>(emptyMap);
+//        Map<Integer, Integer> perm_13_1_1_0_0 = new HashMap<>(emptyMap);
+//        Map<Integer, Integer> perm_15_0_1_0_0 = new HashMap<>(emptyMap);
+//
+//        Map<Integer, Integer> perm_0_10_0_0_0 = new HashMap<>(emptyMap);
+//        Map<Integer, Integer> perm_2_9_0_0_0 = new HashMap<>(emptyMap);
+//        Map<Integer, Integer> perm_4_8_0_0_0 = new HashMap<>(emptyMap);
+//
+//        perm_0_0_0_0_1.put(20, 1);
+//        permutationsTwenty.add(perm_0_0_0_0_1);
+//
+//        perm_0_0_0_2_0.put(10, 2);
+//        permutationsTwenty.add(perm_0_0_0_2_0);
+//
+//        perm_0_0_2_1_0.put(5, 2);
+//        perm_0_0_2_1_0.put(10, 1);
+//        permutationsTwenty.add(perm_0_0_2_1_0);
+//
+//        perm_1_2_1_1_0.put(10, 1);
+//        perm_1_2_1_1_0.put(5, 1);
+//        perm_1_2_1_1_0.put(2, 2);
+//        perm_1_2_1_1_0.put(1, 1);
+//        permutationsTwenty.add(perm_1_2_1_1_0);
+//
+//        perm_0_0_4_0_0.put(5, 4);
+//        permutationsTwenty.add(perm_0_0_4_0_0);
+//
+//        perm_1_2_3_0_0.put(5, 3);
+//        perm_1_2_3_0_0.put(2, 2);
+//        perm_1_2_3_0_0.put(1, 1);
+//        permutationsTwenty.add(perm_1_2_3_0_0);
+//
+//        allCombinationsExpected.put(6, permutationsTwenty);
+//
+//        allCombinationsActual = service.generatePossibleChangeCombinations(6, standardDenominations);
+//
+//        assertEquals(allCombinationsExpected.get(6), allCombinationsActual.get(6));
+//    }
+
 
     @Test
     void testJava() {
