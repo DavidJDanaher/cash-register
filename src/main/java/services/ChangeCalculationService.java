@@ -77,7 +77,8 @@ public class ChangeCalculationService {
         return change;
     }
 
-    public Map<Integer, Integer> makeChange(int changeDue, Map<Integer, Integer> contents) {
+    public Map<Integer, Integer> makeChange(int changeDue, Map<Integer, Integer> contents) throws InsufficientFundsException {
+        int[] standardDenominations = new int[] { 1, 2, 5, 10, 20 };
         int arrSize = contents.size();
         int[] keys = new int[arrSize];
 
@@ -92,11 +93,14 @@ public class ChangeCalculationService {
 
         Map<Integer, Integer> change = new RegisterContentsFactory(keys).getContents();
 
+        Map<Integer, ArrayList<Map<Integer, Integer>>> allPossibleCombos = generatePossibleChangeCombinations(changeDue, standardDenominations, contents);
+        ArrayList<Map<Integer, Integer>> possibleChangeCombos = allPossibleCombos.get(changeDue);
 
+        if (possibleChangeCombos.isEmpty()) {
+            throw new InsufficientFundsException("change");
+        }
 
-
-
-        return change;
+        return possibleChangeCombos.get(0);
     }
 
     public Map<Integer, ArrayList<Map<Integer, Integer>>> generatePossibleChangeCombinations(int change, int[] denominations, Map<Integer, Integer> contents) {
@@ -110,7 +114,7 @@ public class ChangeCalculationService {
         for (int i = 1; i <= change; i++) {
             combinationsOfValue = new ArrayList<>();
 
-            if (i == denominations[denominationIndex]) {
+            if (denominationIndex < denominations.length && i == denominations[denominationIndex]) {
                 singlePermutation = new HashMap<>(emptyMap);
                 singlePermutation.put(i, 1);
 
