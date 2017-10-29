@@ -10,9 +10,9 @@ public class CashRegisterModel {
     private Map<Integer, Integer> contents;
     private ChangeCalculationService changeService;
 
-    public CashRegisterModel(int[] denominations) {
-        contents = new RegisterContentsFactory(denominations).getContents();
-        changeService = new ChangeCalculationService();
+    public CashRegisterModel(RegisterContentsFactory factory) {
+        contents = factory.getContents();
+        changeService = new ChangeCalculationService(factory);
     }
 
     public Map<Integer, Integer> getContents() {
@@ -55,7 +55,7 @@ public class CashRegisterModel {
         }
 
         try {
-            change = changeService.getChange(changeRequested, contents);
+            change = changeService.makeChange(changeRequested, contents);
             withdraw(change);
 
             return change;

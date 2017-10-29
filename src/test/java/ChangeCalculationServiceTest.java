@@ -16,11 +16,12 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 class ChangeCalculationServiceTest {
     private Map<Integer, Integer> changeReceived;
     private ChangeCalculationService changeService;
+    private RegisterContentsFactory factory = new RegisterContentsFactory(new int[] { 20, 10, 5, 2, 1 });;
 
     @BeforeEach
     void createNewRegister() {
         changeReceived = new HashMap<>();
-        changeService = new ChangeCalculationService();
+        changeService = new ChangeCalculationService(factory);
     }
 
     @Test
@@ -283,6 +284,6 @@ class ChangeCalculationServiceTest {
     }
 
     private Map<Integer, Integer> currencyMap(int ones, int twos, int fives, int tens, int twenties) {
-        return new RegisterContentsFactory(new int[] { 1, 2, 5, 10, 20 }, new int[] { ones, twos, fives, tens, twenties }).getContents();
+        return factory.getContents(new int[] { twenties, tens, fives, twos, ones });
     }
 }

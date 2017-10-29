@@ -6,115 +6,44 @@ import main.java.resources.exceptions.InsufficientFundsException;
 import java.util.*;
 
 public class ChangeCalculationService {
-
-    public ChangeCalculationService() {
-    }
-
-    public Map<Integer, Integer> getChange(int changeDue, Map<Integer, Integer> contents) throws InsufficientFundsException {
-        //This is done to avoid needing to cast 1 and -1 as a int in each loop.
-        int positiveOne = 1;
-        int negativeOne = -1;
-        int arrSize = contents.size();
-        int[] keys = new int[arrSize];
-
-        Integer[] arr = contents.keySet().toArray(new Integer[arrSize]);
-
-        for(int i = 0; i < arrSize; i++) {
-            keys[i] = arr[i].intValue();
-        }
-
-        Map<Integer, Integer> change = new RegisterContentsFactory(keys).getContents();
-        Map<Integer, Integer> contentsCopy = new RegisterContentsFactory(keys).getContents();
-        contentsCopy.putAll(contents);
-
-        if (changeDue % 2 != 0 && contentsCopy.get(5) == 0 && contentsCopy.get(1) == 0) {
-            throw new InsufficientFundsException("change");
-        }
-
-        while (changeDue >= 20 && contentsCopy.get(20) > 0) {
-            changeDue -= 20;
-            change.merge(20, positiveOne, Integer::sum);
-            contentsCopy.merge(20, negativeOne, Integer::sum);
-        }
-
-        while (changeDue >= 10 && contentsCopy.get(10) > 0) {
-            if (changeDue >= 10 + 5 || changeDue % 2 == 0 || contentsCopy.get(1) > 0) {
-                changeDue -= 10;
-                change.merge(10, positiveOne, Integer::sum);
-                contentsCopy.merge(10, negativeOne, Integer::sum);
-            } else {
-                break;
-            }
-        }
-
-        while (changeDue >= 5 && contentsCopy.get(5) > 0) {
-            if (changeDue % 2 == 1 || contentsCopy.get(1) > 0 || contentsCopy.get(5) > 1) {
-                changeDue -= 5;
-                change.merge(5, positiveOne, Integer::sum);
-                contentsCopy.merge(5, negativeOne, Integer::sum);
-            } else {
-                break;
-            }
-        }
-
-        while (changeDue >= 2 && contentsCopy.get(2) > 0) {
-            changeDue -= 2;
-            change.merge(2, positiveOne, Integer::sum);
-            contentsCopy.merge(2, negativeOne, Integer::sum);
-        }
-
-        while (changeDue >= 1 && contentsCopy.get(1) > 0) {
-            changeDue -= 1;
-            change.merge(1, positiveOne, Integer::sum);
-            contentsCopy.merge(1, negativeOne, Integer::sum);
-        }
-
-        if (changeDue != 0) {
-            change.clear();
-            throw new InsufficientFundsException("change");
-        }
-
-        return change;
+    private int[] currencyDenominations;
+    private RegisterContentsFactory factory;
+    public ChangeCalculationService(RegisterContentsFactory contentsFactory) {
+        factory = contentsFactory;
+        currencyDenominations = factory.getDenominations();
     }
 
     public Map<Integer, Integer> makeChange(int changeDue, Map<Integer, Integer> contents) throws InsufficientFundsException {
-        int[] standardDenominations = new int[] { 1, 2, 5, 10, 20 };
-        int arrSize = contents.size();
-        int[] keys = new int[arrSize];
+        Map<Integer, Integer> optimalChangeCandidate;
 
-        Integer[] arr = contents.keySet().toArray(new Integer[arrSize]);
+        Map<Integer, ArrayList<Map<Integer, Integer>>> allPossibleCombos = generatePossibleChangeCombinations(changeDue, contents);
+        ArrayList<Map<Integer, Integer>> possibleChangePermutations = allPossibleCombos.get(changeDue);
 
-        Arrays.sort(arr);
-
-
-        for(int i = 0; i < arrSize; i++) {
-            keys[i] = arr[i].intValue();
-        }
-
-        Map<Integer, Integer> change = new RegisterContentsFactory(keys).getContents();
-
-        Map<Integer, ArrayList<Map<Integer, Integer>>> allPossibleCombos = generatePossibleChangeCombinations(changeDue, standardDenominations, contents);
-        ArrayList<Map<Integer, Integer>> possibleChangeCombos = allPossibleCombos.get(changeDue);
-
-        if (possibleChangeCombos.isEmpty()) {
+        if (possibleChangePermutations.isEmpty()) {
             throw new InsufficientFundsException("change");
         }
 
-        return possibleChangeCombos.get(0);
+        optimalChangeCandidate = possibleChangePermutations.get(0);
+
+        return optimalChangeCandidate;
     }
 
-    public Map<Integer, ArrayList<Map<Integer, Integer>>> generatePossibleChangeCombinations(int change, int[] denominations, Map<Integer, Integer> contents) {
+    public Map<Integer, ArrayList<Map<Integer, Integer>>> generatePossibleChangeCombinations(int change,  Map<Integer, Integer> contents) {
         Map<Integer, ArrayList<Map<Integer, Integer>>> allCombinations = new HashMap<>();
         ArrayList<Map<Integer, Integer>> combinationsOfValue;
-        Map<Integer, Integer> emptyMap = new RegisterContentsFactory(denominations).getContents();
+        Map<Integer, Integer> emptyMap = factory.getContents();
         Map<Integer, Integer> singlePermutation;
 
         int denominationIndex = 0;
+        int[] currencySmallToLarge = currencyDenominations.clone();
+
+        Arrays.sort(currencySmallToLarge);
+
 
         for (int i = 1; i <= change; i++) {
             combinationsOfValue = new ArrayList<>();
 
-            if (denominationIndex < denominations.length && i == denominations[denominationIndex]) {
+            if (denominationIndex < currencySmallToLarge.length && i == currencySmallToLarge[denominationIndex]) {
                 singlePermutation = new HashMap<>(emptyMap);
                 singlePermutation.put(i, 1);
 
@@ -126,7 +55,7 @@ public class ChangeCalculationService {
                 combinationsOfValue = mergeAll(allCombinations.get(j), allCombinations.get(i - j), combinationsOfValue, contents);
             }
 
-            Collections.sort(combinationsOfValue, new DescendingDenomValue());
+            Collections.sort(combinationsOfValue, new DescendingDenomValue(currencyDenominations));
 
             allCombinations.put(i, combinationsOfValue);
         }
@@ -153,18 +82,27 @@ public class ChangeCalculationService {
     }
 
     class DescendingDenomValue implements Comparator<Map<Integer, Integer>> {
-        int[] standardDenominations = new int[] { 1, 2, 5, 10, 20 };
-        int difference = 0;
+        int[] currencyDenominations;
+        int result = 0;
+
+        public DescendingDenomValue(int[] denominations) {
+            currencyDenominations = denominations;
+        }
 
         public int compare(Map<Integer, Integer> map1, Map<Integer, Integer> map2) {
-            for (int i = standardDenominations[standardDenominations.length - 1]; i >= 0; i--) {
-                if (!(map1.get(i) == map2.get(i))) {
-                    difference = map2.get(i) - map1.get(i);
+            for (int i = 0; i <  currencyDenominations.length - 1; i++) {
+                if (map1.get(currencyDenominations[i]) > map2.get(currencyDenominations[i])) {
+                    result = -1;
                     break;
+                } else if (map1.get(currencyDenominations[i]) < map2.get(currencyDenominations[i])) {
+                    result = 1;
+                    break;
+                } else {
+                    result = 0;
                 }
             }
 
-            return difference;
+            return result;
         }
     }
 

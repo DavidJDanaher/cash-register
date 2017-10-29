@@ -15,10 +15,12 @@ import static org.mockito.Mockito.when;
 @DisplayName("Cash Register Unit Tests")
 class CashRegisterModelTest {
     private CashRegisterModel register;
+    private RegisterContentsFactory factory;
 
     @BeforeEach
     void createNewRegister() {
-      register = new CashRegisterModel(new int[] { 1, 2, 5, 10, 20 });
+        factory = new RegisterContentsFactory(new int[] { 20, 10, 5, 2, 1 });
+        register = new CashRegisterModel(factory);
     }
 
     @Nested
@@ -27,7 +29,7 @@ class CashRegisterModelTest {
         @Test
         @DisplayName("Empty Register")
         void testGetContents() {
-            assertEquals(new RegisterContentsFactory(new int[] { 1, 2, 5, 10, 20 }).getContents(), register.getContents());
+            assertEquals(factory.getContents(), register.getContents());
         }
     }
 
@@ -93,7 +95,6 @@ class CashRegisterModelTest {
         void testRemoveContentsFromRegister_InsufficientFives() {
             register.deposit(currencyMap( 3, 4, 2, 2, 1 ));
 
-
             try {
                 register.withdraw(currencyMap( 3, 3, 4, 0, 1 ));
             } catch (InsufficientFundsException e) {
@@ -122,7 +123,6 @@ class CashRegisterModelTest {
         @DisplayName("When there are insufficient $20 Bills")
         void testRemoveContentsFromRegister_InsufficientTwenties() {
             register.deposit(currencyMap( 3, 4, 2, 2, 0 ));
-
 
             try {
                 register.withdraw(currencyMap( 3, 3, 1, 1, 1 ));
@@ -156,7 +156,6 @@ class CashRegisterModelTest {
     class TestMakeChange {
         // The use of Mockito here throws a warning, but I've left it because the code isn't doing anything unexpected
         ChangeCalculationService mockChangeService = mock(ChangeCalculationService.class);
-        CashRegisterModel register = new CashRegisterModel(new int[] { 1, 2, 5, 10, 20 });
 
         @Test
         void testMakeChange_Insufficient() {
@@ -175,7 +174,7 @@ class CashRegisterModelTest {
             register.deposit(currencyMap(3, 3, 3, 3, 3 ));
 
             try {
-                when(mockChangeService.getChange(38, register.getContents())).thenReturn(mockChange);
+                when(mockChangeService.makeChange(38, register.getContents())).thenReturn(mockChange);
                 register.makeChange( 38);
 
             } catch (InsufficientFundsException e) { }
@@ -185,7 +184,7 @@ class CashRegisterModelTest {
     }
 
     private Map<Integer, Integer> currencyMap(int ones, int twos, int fives, int tens, int twenties) {
-        return new RegisterContentsFactory(new int[] { 1, 2, 5, 10, 20 }, new int[] { ones, twos, fives, tens, twenties }).getContents();
+        return factory.getContents(new int[] { twenties, tens, fives, twos, ones });
     }
 }
 

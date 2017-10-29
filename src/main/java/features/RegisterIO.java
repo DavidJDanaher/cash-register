@@ -9,13 +9,14 @@ import java.util.Scanner;
 
 public class RegisterIO {
     private CashRegisterModel register;
+    private RegisterContentsFactory factory;
     private Scanner in;
     int[] currencyList;
 
     public RegisterIO() {
-        currencyList = new int[] { 20, 10, 5, 2, 1};
-
-        register = new CashRegisterModel(currencyList);
+        currencyList = new int[] { 20, 10, 5, 2, 1 };
+        factory = new RegisterContentsFactory(currencyList);
+        register = new CashRegisterModel(factory);
 
         startApplication();
     }
@@ -96,8 +97,6 @@ public class RegisterIO {
         } catch (InvalidInputException e) {
             print(e);
         }
-
-
     }
 
     private void withdrawBills(String[] inputs) {
@@ -114,8 +113,6 @@ public class RegisterIO {
         } catch (ArrayIndexOutOfBoundsException e) {
             print(e);
         }
-
-
     }
 
     private void makeChange(String[] inputs) {
@@ -146,7 +143,7 @@ public class RegisterIO {
             int ones = Integer.parseInt(input[5]);
             currencyInputs = new int[] { twenties, tens, fives, twos, ones };
 
-            inputMap = new RegisterContentsFactory(currencyList, currencyInputs).getContents();
+            inputMap = factory.getContents(currencyInputs);
 
             return inputMap;
         } catch (ArrayIndexOutOfBoundsException e) {
