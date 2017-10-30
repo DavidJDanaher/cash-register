@@ -27,6 +27,7 @@ public class RegisterIO {
         String command;
 
         System.out.println("This is a cash register. \nYou have a few commands available to you.");
+        
         printHelpMenu();
         System.out.println("Ready for input... \n");
 

@@ -13,7 +13,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 class ChangeGenerationTest {
 
     @Nested
-    @DisplayName("Standard Denominations")
+    @DisplayName("Standard Denominations, 20, 10, 5, 2, 1")
     class StandardDenomination{
         Map<Integer, ArrayList<Map<Integer, Integer>>> allCombinationsActual;
         Map<Integer, Integer> singlePermutation;
@@ -178,8 +178,49 @@ class ChangeGenerationTest {
 
 
     @Nested
-    @DisplayName("")
+    @DisplayName("Other Denominations")
     class OtherCurrencyDenominations {
+        Map<Integer, ArrayList<Map<Integer, Integer>>> allCombinationsActual;
+        Map<Integer, ArrayList<Map<Integer, Integer>>> allCombinationsExpected = new HashMap<>();
 
+        @AfterEach
+        void tearDown() {
+            allCombinationsActual.clear();
+        }
+
+        @Test
+        @DisplayName("Combinations of 23, 7, and 3")
+        void test_23_7_3() {
+            int[] oddDenominations = new int[] { 23, 7, 3 };
+            CurrencyFactory currency = new CurrencyFactory(oddDenominations);
+            ChangeCalculationService service = new ChangeCalculationService(currency);
+            Map<Integer, Integer> sufficientRegister = currency.getAsMap(new int[] { 9, 9, 9 });
+
+            ArrayList<Map<Integer,Integer>> permutationsTwentyThree = new ArrayList<>();
+            Map<Integer, Integer> perm_1_0_0 = currency.getAsMap();
+            Map<Integer, Integer> perm_0_2_3 = currency.getAsMap();
+
+            perm_1_0_0.put(23, 1);
+            permutationsTwentyThree.add(perm_1_0_0);
+
+            perm_0_2_3.put(7, 2);
+            perm_0_2_3.put(3, 3);
+            permutationsTwentyThree.add(perm_0_2_3);
+
+            allCombinationsExpected.put(23, permutationsTwentyThree);
+
+            allCombinationsActual = service.generatePossibleChangePermutations(23, sufficientRegister);
+
+            assertEquals(allCombinationsExpected.get(23), allCombinationsActual.get(23));
+            assertEquals(currency.getAsMap(new int[] { 0, 1, 5 }), allCombinationsActual.get(22).get(0));
+            assertEquals(currency.getAsMap(new int[] { 0, 3, 0 }), allCombinationsActual.get(21).get(0));
+            assertEquals(currency.getAsMap(new int[] { 0, 2, 2 }), allCombinationsActual.get(20).get(0));
+            assertEquals(currency.getAsMap(new int[] { 0, 2, 1 }), allCombinationsActual.get(17).get(0));
+            assertEquals(currency.getAsMap(new int[] { 0, 1, 3 }), allCombinationsActual.get(16).get(0));
+            assertEquals(currency.getAsMap(new int[] { 0, 0, 5 }), allCombinationsActual.get(15).get(0));
+            assertEquals(0, allCombinationsActual.get(11).size());
+            assertEquals(0, allCombinationsActual.get(8).size());
+            assertEquals(0, allCombinationsActual.get(5).size());
+        }
     }
 }
