@@ -26,7 +26,7 @@ class ChangeCalculationServiceTest {
 
     @Test
     @DisplayName("Insufficient Funds")
-    void testmakeChange_InsufficientFunds() {
+    void test_makeChange_InsufficientFunds() {
         Map<Integer, Integer> contents = currencyMap( 3 ,0, 0, 0, 0 );
 
         try {
@@ -40,7 +40,7 @@ class ChangeCalculationServiceTest {
 
     @Test
     @DisplayName("Odd change, unable to dispense")
-    void testmakeChange_OddChange_Insufficient() {
+    void test_makeChange_OddChange_Insufficient() {
         Map<Integer, Integer> contents = currencyMap( 0, 4, 0, 5, 5 );
 
         try {
@@ -54,7 +54,7 @@ class ChangeCalculationServiceTest {
 
     @Test
     @DisplayName("Basic case")
-    void testmakeChange_Basic() {
+    void test_makeChange_Basic() {
         Map<Integer, Integer> contents = currencyMap( 2,2,2,2,2 );
 
         try {
@@ -67,7 +67,7 @@ class ChangeCalculationServiceTest {
 
     @Test
     @DisplayName("Insufficient bills are handled by smallern denominations")
-    void testmakeChange_Insufficient() {
+    void test_makeChange_Insufficient() {
         Map<Integer, Integer> contents = currencyMap( 3, 5, 3, 1, 2 );
 
         try {
@@ -83,7 +83,7 @@ class ChangeCalculationServiceTest {
     class SmallEvens {
         @Test
         @DisplayName("Change of 8 when missing a 1, sufficient 2s")
-        void testmakeChange_SpecialCase_Eight_AvoidFive() {
+        void test_makeChange_SpecialCase_Eight_AvoidFive() {
             Map<Integer, Integer> contents = currencyMap( 0, 4, 1, 0, 0 );
 
             try {
@@ -95,7 +95,7 @@ class ChangeCalculationServiceTest {
 
         @Test
         @DisplayName("Change of 8 with missing 1, insufficient 2s")
-        void testmakeChange_SpecialCase_Eight_AvoidFive_Insufficient() {
+        void test_makeChange_SpecialCase_Eight_AvoidFive_Insufficient() {
             Map<Integer, Integer> contents = currencyMap( 0, 3, 1, 1, 0 );
 
             try {
@@ -113,7 +113,7 @@ class ChangeCalculationServiceTest {
     class TeenOdds {
         @Test
         @DisplayName("Change of 13, sufficient")
-        void testmakeChange_SpecialCase_Thirteen() {
+        void test_makeChange_SpecialCase_Thirteen() {
             Map<Integer, Integer> contents = currencyMap( 1, 4, 3, 1, 1 );
 
             try {
@@ -126,7 +126,7 @@ class ChangeCalculationServiceTest {
 
         @Test
         @DisplayName("Change of 13, no 10s, sufficient 1s")
-        void testmakeChange_SpecialCase_Thirteen_NoTens() {
+        void test_makeChange_SpecialCase_Thirteen_NoTens() {
             Map<Integer, Integer> contents = currencyMap( 1, 4, 3, 0, 1 );
 
             try {
@@ -139,7 +139,7 @@ class ChangeCalculationServiceTest {
 
         @Test
         @DisplayName("Change of 13 with no 1s, sufficient 2s")
-        void testmakeChange_SpecialCase_Thirteen_AvoidTen_NoOnes() {
+        void test_makeChange_SpecialCase_Thirteen_AvoidTen_NoOnes() {
             Map<Integer, Integer> contents = currencyMap( 0, 4, 2, 1, 1 );
 
             try {
@@ -152,7 +152,7 @@ class ChangeCalculationServiceTest {
 
         @Test
         @DisplayName("Change of 13 with no 1s, insufficient 2s")
-        void testmakeChange_SpecialCase_Thirteen_Insufficient() {
+        void test_makeChange_SpecialCase_Thirteen_Insufficient() {
             Map<Integer, Integer> contents = currencyMap( 0, 2, 2, 1, 1 );
 
             try {
@@ -170,7 +170,7 @@ class ChangeCalculationServiceTest {
     class TeenEvens {
         @Test
         @DisplayName("Change of 14 with no 10s, sufficient 1s")
-        void testmakeChange_SpecialCase_Fourteen_AvoidTen_OneFive() {
+        void test_makeChange_SpecialCase_Fourteen_AvoidTen_OneFive() {
             Map<Integer, Integer> contents = currencyMap( 3, 6, 1, 0, 1 );
 
             try {
@@ -183,7 +183,7 @@ class ChangeCalculationServiceTest {
 
         @Test
         @DisplayName("Change of 14 with no 10s, no 1s")
-        void testmakeChange_SpecialCase_Fourteen_AvoidTen_TwoFives() {
+        void test_makeChange_SpecialCase_Fourteen_AvoidTen_TwoFives() {
             Map<Integer, Integer> contents = currencyMap( 3, 6, 2, 0, 1 );
 
             try {
@@ -196,7 +196,7 @@ class ChangeCalculationServiceTest {
 
         @Test
         @DisplayName("Change of 14 with no 10s, no 1s, one 5")
-        void testmakeChange_SpecialCase_Fourteen_AvoidTen_OneFive_NoOnes() {
+        void test_makeChange_SpecialCase_Fourteen_AvoidTen_OneFive_NoOnes() {
             Map<Integer, Integer> contents = currencyMap( 0, 10, 1, 0, 1 );
 
             try {
@@ -209,7 +209,7 @@ class ChangeCalculationServiceTest {
 
         @Test
         @DisplayName("Change of 14, unable to dispense")
-        void testmakeChange_SpecialCase_Fourteen_Insufficent() {
+        void test_makeChange_SpecialCase_Fourteen_Insufficent() {
             Map<Integer, Integer> contents = currencyMap( 0, 6, 1, 0, 1 );
 
             try {
@@ -223,7 +223,7 @@ class ChangeCalculationServiceTest {
 
         @Test
         @DisplayName("Change of 18 with no 10s, sufficient 1s")
-        void testmakeChange_SpecialCase_Eighteen_AvoidTen() {
+        void test_makeChange_SpecialCase_Eighteen_AvoidTen() {
             Map<Integer, Integer> contents = currencyMap( 1, 4, 3, 0, 1 );
 
             try {
@@ -236,7 +236,7 @@ class ChangeCalculationServiceTest {
 
         @Test
         @DisplayName("Change of 18 with no 10s, no 1s")
-        void testmakeChange_SpecialCase_Eighteen_AvoidTen_InsufficientOnes() {
+        void test_makeChange_SpecialCase_Eighteen_AvoidTen_InsufficientOnes() {
             Map<Integer, Integer> contents = currencyMap( 0, 4, 3, 0, 1 );
 
             try {
@@ -249,7 +249,7 @@ class ChangeCalculationServiceTest {
 
         @Test
         @DisplayName("Change of 18, unable to dispense")
-        void testmakeChange_SpecialCase_Eighteen_Insufficient() {
+        void test_makeChange_SpecialCase_Eighteen_Insufficient() {
             Map<Integer, Integer> contents = currencyMap( 0, 3, 3, 1, 1 );
 
             try {
@@ -263,7 +263,7 @@ class ChangeCalculationServiceTest {
 
         @Test
         @DisplayName("Nate - Happy Path change $18")
-        void testmakeChange_Happy18() throws Exception {
+        void test_makeChange_Happy18() throws Exception {
             Map<Integer, Integer> contents = currencyMap( 0, 4, 4, 0, 0 );
 
             changeReceived = changeService.makeChange(18, contents);
@@ -274,12 +274,23 @@ class ChangeCalculationServiceTest {
 
         @Test
         @DisplayName("Nate - Happy Path change $6")
-        void testmakeChange_Happy6() throws Exception {
+        void test_makeChange_Happy6() throws Exception {
             Map<Integer, Integer> contents = currencyMap( 0, 4, 2, 0, 0 );
 
             changeReceived = changeService.makeChange(6, contents);
 
             assertEquals(currencyMap( 0, 3, 0, 0, 0 ), changeReceived);
+        }
+
+        @Test
+        void Ten() {
+            Map<Integer, Integer> contents = currencyMap( 1, 4, 3, 0, 1 );
+
+            try {
+                changeReceived = changeService.makeChange(10, contents);
+            } catch (InsufficientFundsException e) {}
+
+            assertEquals(currencyMap( 0, 0, 2, 0, 0 ), changeReceived);
         }
     }
 

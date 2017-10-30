@@ -46,10 +46,13 @@ public class ChangeCalculationService {
             permutationsOfValue = new ArrayList<>();
 
             if (denominationIndex < currencySmallToLarge.length && i == currencySmallToLarge[denominationIndex]) {
-                singlePermutation = currency.getAsMap();
-                singlePermutation.put(i, 1);
+                if (contents.get(i) > 0) {
+                    singlePermutation = currency.getAsMap();
+                    singlePermutation.put(i, 1);
 
-                permutationsOfValue.add(singlePermutation);
+                    permutationsOfValue.add(singlePermutation);
+                }
+
                 denominationIndex++;
             }
 
