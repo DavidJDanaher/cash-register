@@ -9,14 +9,14 @@ import java.util.Scanner;
 
 public class RegisterIO {
     private CashRegisterModel register;
-    private CurrencyFactory factory;
+    private CurrencyFactory currency;
     private Scanner in;
     int[] currencyList;
 
     public RegisterIO() {
         currencyList = new int[] { 20, 10, 5, 2, 1 };
-        factory = new CurrencyFactory(currencyList);
-        register = new CashRegisterModel(factory);
+        currency = new CurrencyFactory(currencyList);
+        register = new CashRegisterModel(currency);
 
         startApplication();
     }
@@ -144,7 +144,7 @@ public class RegisterIO {
             int ones = Integer.parseInt(input[5]);
             currencyInputs = new int[] { twenties, tens, fives, twos, ones };
 
-            inputMap = factory.getAsMap(currencyInputs);
+            inputMap = currency.getAsMap(currencyInputs);
 
             return inputMap;
         } catch (ArrayIndexOutOfBoundsException e) {
@@ -157,7 +157,7 @@ public class RegisterIO {
     }
 
     private void print(Map<Integer, Integer> value) {
-        for (Integer key : value.keySet()) {
+        for (int key : currency.getAsArray()) {
             System.out.print(value.get(key) + " ");
         }
 
