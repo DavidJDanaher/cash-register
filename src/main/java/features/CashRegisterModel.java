@@ -1,7 +1,7 @@
 package main.java.features;
 
 import main.java.resources.exceptions.InsufficientFundsException;
-import main.java.resources.RegisterContentsFactory;
+import main.java.resources.CurrencyFactory;
 import main.java.services.ChangeCalculationService;
 
 import java.util.Map;
@@ -10,9 +10,9 @@ public class CashRegisterModel {
     private Map<Integer, Integer> contents;
     private ChangeCalculationService changeService;
 
-    public CashRegisterModel(RegisterContentsFactory factory) {
-        contents = factory.getContents();
-        changeService = new ChangeCalculationService(factory);
+    public CashRegisterModel(CurrencyFactory currency) {
+        contents = currency.getAsMap();
+        changeService = new ChangeCalculationService(currency);
     }
 
     public Map<Integer, Integer> getContents() {
@@ -47,7 +47,7 @@ public class CashRegisterModel {
         withdrawal.forEach((key, value) -> contents.merge(key, value, (current, withdraw) -> current - withdraw));
     }
 
-    public Map<Integer, Integer> makeChange (Integer changeRequested) throws InsufficientFundsException {
+    public Map<Integer, Integer> makeChange (int changeRequested) throws InsufficientFundsException {
         Map<Integer, Integer> change;
 
         if (changeRequested > getBalance()) {

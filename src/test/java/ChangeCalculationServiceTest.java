@@ -2,7 +2,7 @@ package test.java;
 
 import main.java.resources.exceptions.InsufficientFundsException;
 import main.java.services.ChangeCalculationService;
-import main.java.resources.RegisterContentsFactory;
+import main.java.resources.CurrencyFactory;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
@@ -16,7 +16,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 class ChangeCalculationServiceTest {
     private Map<Integer, Integer> changeReceived;
     private ChangeCalculationService changeService;
-    private RegisterContentsFactory factory = new RegisterContentsFactory(new int[] { 20, 10, 5, 2, 1 });;
+    private CurrencyFactory factory = new CurrencyFactory(new int[] { 20, 10, 5, 2, 1 });;
 
     @BeforeEach
     void createNewRegister() {
@@ -284,6 +284,6 @@ class ChangeCalculationServiceTest {
     }
 
     private Map<Integer, Integer> currencyMap(int ones, int twos, int fives, int tens, int twenties) {
-        return factory.getContents(new int[] { twenties, tens, fives, twos, ones });
+        return factory.getAsMap(new int[] { twenties, tens, fives, twos, ones });
     }
 }

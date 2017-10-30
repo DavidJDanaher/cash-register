@@ -1,21 +1,21 @@
 package main.java.features;
 
+import main.java.resources.CurrencyFactory;
 import main.java.resources.exceptions.InsufficientFundsException;
 import main.java.resources.exceptions.InvalidInputException;
-import main.java.resources.RegisterContentsFactory;
 
 import java.util.Map;
 import java.util.Scanner;
 
 public class RegisterIO {
     private CashRegisterModel register;
-    private RegisterContentsFactory factory;
+    private CurrencyFactory factory;
     private Scanner in;
     int[] currencyList;
 
     public RegisterIO() {
         currencyList = new int[] { 20, 10, 5, 2, 1 };
-        factory = new RegisterContentsFactory(currencyList);
+        factory = new CurrencyFactory(currencyList);
         register = new CashRegisterModel(factory);
 
         startApplication();
@@ -143,7 +143,7 @@ public class RegisterIO {
             int ones = Integer.parseInt(input[5]);
             currencyInputs = new int[] { twenties, tens, fives, twos, ones };
 
-            inputMap = factory.getContents(currencyInputs);
+            inputMap = factory.getAsMap(currencyInputs);
 
             return inputMap;
         } catch (ArrayIndexOutOfBoundsException e) {

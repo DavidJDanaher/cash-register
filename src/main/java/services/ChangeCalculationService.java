@@ -1,66 +1,68 @@
 package main.java.services;
 
-import main.java.resources.RegisterContentsFactory;
+import main.java.resources.CurrencyComparator;
+import main.java.resources.CurrencyFactory;
 import main.java.resources.exceptions.InsufficientFundsException;
 
 import java.util.*;
 
 public class ChangeCalculationService {
     private int[] currencyDenominations;
-    private RegisterContentsFactory factory;
-    public ChangeCalculationService(RegisterContentsFactory contentsFactory) {
-        factory = contentsFactory;
-        currencyDenominations = factory.getDenominations();
+    private CurrencyFactory currency;
+    private CurrencyComparator descendingCurrencyValue;
+
+    public ChangeCalculationService(CurrencyFactory contentsFactory) {
+        currency = contentsFactory;
+        currencyDenominations = currency.getAsArray();
+        descendingCurrencyValue = new CurrencyComparator(currencyDenominations);
     }
 
     public Map<Integer, Integer> makeChange(int changeDue, Map<Integer, Integer> contents) throws InsufficientFundsException {
         Map<Integer, Integer> optimalChangeCandidate;
 
-        Map<Integer, ArrayList<Map<Integer, Integer>>> allPossibleCombos = generatePossibleChangeCombinations(changeDue, contents);
-        ArrayList<Map<Integer, Integer>> possibleChangePermutations = allPossibleCombos.get(changeDue);
+        Map<Integer, ArrayList<Map<Integer, Integer>>> masterPermutationCollection = generatePossibleChangePermutations(changeDue, contents);
+        ArrayList<Map<Integer, Integer>> permutationsOfChange = masterPermutationCollection.get(changeDue);
 
-        if (possibleChangePermutations.isEmpty()) {
+        if (permutationsOfChange.isEmpty()) {
             throw new InsufficientFundsException("change");
         }
 
-        optimalChangeCandidate = possibleChangePermutations.get(0);
+        optimalChangeCandidate = permutationsOfChange.get(0);
 
         return optimalChangeCandidate;
     }
 
-    public Map<Integer, ArrayList<Map<Integer, Integer>>> generatePossibleChangeCombinations(int change,  Map<Integer, Integer> contents) {
-        Map<Integer, ArrayList<Map<Integer, Integer>>> allCombinations = new HashMap<>();
-        ArrayList<Map<Integer, Integer>> combinationsOfValue;
-        Map<Integer, Integer> emptyMap = factory.getContents();
+    public Map<Integer, ArrayList<Map<Integer, Integer>>> generatePossibleChangePermutations(int change,  Map<Integer, Integer> contents) {
+        Map<Integer, ArrayList<Map<Integer, Integer>>> allPermutations = new HashMap<>();
+        ArrayList<Map<Integer, Integer>> permutationsOfValue;
         Map<Integer, Integer> singlePermutation;
 
-        int denominationIndex = 0;
         int[] currencySmallToLarge = currencyDenominations.clone();
+        int denominationIndex = 0;
 
         Arrays.sort(currencySmallToLarge);
 
-
         for (int i = 1; i <= change; i++) {
-            combinationsOfValue = new ArrayList<>();
+            permutationsOfValue = new ArrayList<>();
 
             if (denominationIndex < currencySmallToLarge.length && i == currencySmallToLarge[denominationIndex]) {
-                singlePermutation = new HashMap<>(emptyMap);
+                singlePermutation = currency.getAsMap();
                 singlePermutation.put(i, 1);
 
-                combinationsOfValue.add(singlePermutation);
+                permutationsOfValue.add(singlePermutation);
                 denominationIndex++;
             }
 
             for (int j = i - 1; j >= i - j; j--) {
-                combinationsOfValue = mergeAll(allCombinations.get(j), allCombinations.get(i - j), combinationsOfValue, contents);
+                permutationsOfValue = mergeAll(allPermutations.get(j), allPermutations.get(i - j), permutationsOfValue, contents);
             }
 
-            Collections.sort(combinationsOfValue, new DescendingDenomValue(currencyDenominations));
+            Collections.sort(permutationsOfValue, descendingCurrencyValue);
 
-            allCombinations.put(i, combinationsOfValue);
+            allPermutations.put(i, permutationsOfValue);
         }
 
-        return allCombinations;
+        return allPermutations;
     }
 
     private ArrayList<Map<Integer, Integer>> mergeAll(ArrayList<Map<Integer, Integer>> list1, ArrayList<Map<Integer, Integer>> list2, ArrayList<Map<Integer, Integer>> masterList, Map<Integer, Integer> registerContents) {
@@ -79,31 +81,6 @@ public class ChangeCalculationService {
         }
 
         return masterList;
-    }
-
-    class DescendingDenomValue implements Comparator<Map<Integer, Integer>> {
-        int[] currencyDenominations;
-        int result = 0;
-
-        public DescendingDenomValue(int[] denominations) {
-            currencyDenominations = denominations;
-        }
-
-        public int compare(Map<Integer, Integer> map1, Map<Integer, Integer> map2) {
-            for (int i = 0; i <  currencyDenominations.length - 1; i++) {
-                if (map1.get(currencyDenominations[i]) > map2.get(currencyDenominations[i])) {
-                    result = -1;
-                    break;
-                } else if (map1.get(currencyDenominations[i]) < map2.get(currencyDenominations[i])) {
-                    result = 1;
-                    break;
-                } else {
-                    result = 0;
-                }
-            }
-
-            return result;
-        }
     }
 
     private boolean insufficientFundsCheck(Map<Integer, Integer> changeCandidate, Map<Integer, Integer> contents) {
