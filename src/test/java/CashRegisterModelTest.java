@@ -1,8 +1,8 @@
 package test.java;
 import main.java.features.CashRegisterModel;
+import main.java.resources.CurrencyFactory;
 import main.java.resources.exceptions.InsufficientFundsException;
 
-import main.java.resources.RegisterContentsFactory;
 import main.java.services.ChangeCalculationService;
 import org.junit.jupiter.api.*;
 
@@ -15,10 +15,12 @@ import static org.mockito.Mockito.when;
 @DisplayName("Cash Register Unit Tests")
 class CashRegisterModelTest {
     private CashRegisterModel register;
+    private CurrencyFactory factory;
 
     @BeforeEach
     void createNewRegister() {
-      register = new CashRegisterModel();
+        factory = new CurrencyFactory(new int[] { 20, 10, 5, 2, 1 });
+        register = new CashRegisterModel(factory);
     }
 
     @Nested
@@ -27,7 +29,7 @@ class CashRegisterModelTest {
         @Test
         @DisplayName("Empty Register")
         void testGetContents() {
-            assertEquals(new RegisterContentsFactory(0, 0, 0, 0, 0).getContents(), register.getContents());
+            assertEquals(factory.getAsMap(), register.getContents());
         }
     }
 
@@ -37,11 +39,11 @@ class CashRegisterModelTest {
         @Test
         @DisplayName("Added Contents")
         void testAddContentsToRegister() {
-            register.deposit(new RegisterContentsFactory(3, 5, 2, 1, 1).getContents());
-            assertEquals(new RegisterContentsFactory(3, 5, 2, 1, 1).getContents(), register.getContents());
+            register.deposit(currencyMap( 3, 5, 2, 1, 1 ));
+            assertEquals(currencyMap( 3, 5, 2, 1, 1 ), register.getContents());
 
-            register.deposit(new RegisterContentsFactory(2, 0, 1, 0, 3).getContents());
-            assertEquals(new RegisterContentsFactory(5, 5, 3, 1, 4).getContents(), register.getContents());
+            register.deposit(currencyMap( 2, 0, 1, 0, 3 ));
+            assertEquals(currencyMap( 5, 5, 3, 1, 4 ), register.getContents());
         }
     }
 
@@ -52,85 +54,83 @@ class CashRegisterModelTest {
         @Test
         @DisplayName("When there are sufficient bills")
         void testRemoveContentsFromRegister_Sufficient() throws InsufficientFundsException {
-            register.deposit(new RegisterContentsFactory(3, 4, 2, 2, 1).getContents());
-            register.withdraw(new RegisterContentsFactory(2, 3, 2, 0, 1).getContents());
+            register.deposit(currencyMap( 3, 4, 2, 2, 1 ));
+            register.withdraw(currencyMap( 2, 3, 2, 0, 1 ));
 
-            assertEquals(new RegisterContentsFactory(1, 1, 0, 2, 0).getContents(), register.getContents());
+            assertEquals(currencyMap( 1, 1, 0, 2, 0 ), register.getContents());
         }
 
         @Test
         @DisplayName("When there are insufficient $1 bills")
         void testRemoveContentsFromRegister_InsufficientOnes() {
-            register.deposit(new RegisterContentsFactory(3, 4, 2, 2, 1).getContents());
+            register.deposit(currencyMap( 3, 4, 2, 2, 1 ));
 
 
             try {
-                register.withdraw(new RegisterContentsFactory(4, 3, 3, 0, 1).getContents());
+                register.withdraw(currencyMap( 4, 3, 3, 0, 1 ));
             } catch (InsufficientFundsException e) {
                 assertEquals(new InsufficientFundsException("").getMessage(), e.getMessage());
             }
 
-            assertEquals(new RegisterContentsFactory(3, 4, 2, 2, 1).getContents(), register.getContents());
+            assertEquals(currencyMap( 3, 4, 2, 2, 1 ), register.getContents());
         }
 
         @Test
         @DisplayName("When there are insufficient $2 Bills")
         void testRemoveContentsFromRegister_InsufficientTwos() {
-            register.deposit(new RegisterContentsFactory(3, 4, 2, 2, 1).getContents());
+            register.deposit(currencyMap( 3, 4, 2, 2, 1 ));
 
 
             try {
-                register.withdraw(new RegisterContentsFactory(3, 5, 3, 0, 1).getContents());
+                register.withdraw(currencyMap( 3, 5, 3, 0, 1 ));
             } catch (InsufficientFundsException e) {
                 assertEquals(new InsufficientFundsException("").getMessage(), e.getMessage());
             }
 
-            assertEquals(new RegisterContentsFactory(3, 4, 2, 2, 1).getContents(), register.getContents());
+            assertEquals(currencyMap( 3, 4, 2, 2, 1 ), register.getContents());
         }
 
         @Test
         @DisplayName("When there are insufficient $5 Bills")
         void testRemoveContentsFromRegister_InsufficientFives() {
-            register.deposit(new RegisterContentsFactory(3, 4, 2, 2, 1).getContents());
-
+            register.deposit(currencyMap( 3, 4, 2, 2, 1 ));
 
             try {
-                register.withdraw(new RegisterContentsFactory(3, 3, 4, 0, 1).getContents());
+                register.withdraw(currencyMap( 3, 3, 4, 0, 1 ));
             } catch (InsufficientFundsException e) {
                 assertEquals(new InsufficientFundsException("").getMessage(), e.getMessage());
             }
 
-            assertEquals(new RegisterContentsFactory(3, 4, 2, 2, 1).getContents(), register.getContents());
+            assertEquals(currencyMap( 3, 4, 2, 2, 1 ), register.getContents());
         }
 
         @Test
         @DisplayName("When there are insufficient $10 Bills")
         void testRemoveContentsFromRegister_InsufficientTens() {
-            register.deposit(new RegisterContentsFactory(3, 4, 2, 2, 1).getContents());
+            register.deposit(currencyMap( 3, 4, 2, 2, 1 ));
 
 
             try {
-                register.withdraw(new RegisterContentsFactory(3, 3, 1, 5, 1).getContents());
+                register.withdraw(currencyMap( 3, 3, 1, 5, 1 ));
             } catch (InsufficientFundsException e) {
                 assertEquals(new InsufficientFundsException("").getMessage(), e.getMessage());
             }
 
-            assertEquals(new RegisterContentsFactory(3, 4, 2, 2, 1).getContents(), register.getContents());
+            assertEquals(currencyMap( 3, 4, 2, 2, 1 ), register.getContents());
         }
 
         @Test
         @DisplayName("When there are insufficient $20 Bills")
         void testRemoveContentsFromRegister_InsufficientTwenties() {
-            register.deposit(new RegisterContentsFactory(3, 4, 2, 2, 0).getContents());
-
+            register.deposit(currencyMap( 3, 4, 2, 2, 0 ));
 
             try {
-                register.withdraw(new RegisterContentsFactory(3, 3, 1, 1, 1).getContents());
+                register.withdraw(currencyMap( 3, 3, 1, 1, 1 ));
             } catch (InsufficientFundsException e) {
                 assertEquals(new InsufficientFundsException("").getMessage(), e.getMessage());
             }
 
-            assertEquals(new RegisterContentsFactory(3, 4, 2, 2, 0).getContents(), register.getContents());
+            assertEquals(currencyMap( 3, 4, 2, 2, 0 ), register.getContents());
         }
     }
 
@@ -146,7 +146,7 @@ class CashRegisterModelTest {
         @Test
         @DisplayName("Full Register")
         void testGetTotalValue_full() {
-            register.deposit(new RegisterContentsFactory(3, 2, 4, 3, 6).getContents());
+            register.deposit(currencyMap( 3, 2, 4, 3, 6));
             assertEquals(177, register.getBalance());
         }
     }
@@ -155,33 +155,38 @@ class CashRegisterModelTest {
     @DisplayName("Make Change")
     class TestMakeChange {
         // The use of Mockito here throws a warning, but I've left it because the code isn't doing anything unexpected
-        ChangeCalculationService mockChangeService = mock(ChangeCalculationService.class);
-        CashRegisterModel register = new CashRegisterModel();
 
         @Test
         void testMakeChange_Insufficient() {
-            register.deposit(new RegisterContentsFactory(1, 1, 1, 1, 1).getContents());
+            register.deposit(currencyMap( 1, 1, 1, 1, 1 ));
 
             try {
-                register.makeChange((long) 40);
+                register.makeChange( 40);
             } catch (InsufficientFundsException e) {
                 assertEquals(new InsufficientFundsException("").getMessage(), e.getMessage());
             }
         }
 
         @Test
+        @Disabled
         void testMakeChange_Sufficient() {
-            Map<String, Long> mockChange = new RegisterContentsFactory(1, 1, 1, 1, 1).getContents();
-            register.deposit(new RegisterContentsFactory(3, 3, 3, 3, 3).getContents());
+            CashRegisterModel register = new CashRegisterModel(factory);
+            ChangeCalculationService mockChangeService = mock(ChangeCalculationService.class);
+            Map<Integer, Integer> mockChange = currencyMap(1, 1,1, 1,1);
+            register.deposit(currencyMap(3, 3, 3, 3, 3 ));
 
             try {
-                when(mockChangeService.getChange(38, register.getContents())).thenReturn(mockChange);
-                register.makeChange((long) 38);
+                when(mockChangeService.makeChange(38, register.getContents())).thenReturn(mockChange);
+                register.makeChange( 38);
 
             } catch (InsufficientFundsException e) { }
 
-            assertEquals(new RegisterContentsFactory(2, 2, 2, 2, 2).getContents(), register.getContents());
+            assertEquals(currencyMap(2, 2, 2, 2, 2 ), register.getContents());
         }
+    }
+
+    private Map<Integer, Integer> currencyMap(int ones, int twos, int fives, int tens, int twenties) {
+        return factory.getAsMap(new int[] { twenties, tens, fives, twos, ones });
     }
 }
 

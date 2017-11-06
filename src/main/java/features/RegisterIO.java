@@ -1,35 +1,24 @@
 package main.java.features;
 
+import main.java.resources.CurrencyFactory;
 import main.java.resources.exceptions.InsufficientFundsException;
 import main.java.resources.exceptions.InvalidInputException;
-import main.java.resources.RegisterContentsFactory;
 
 import java.util.Map;
 import java.util.Scanner;
 
 public class RegisterIO {
     private CashRegisterModel register;
+    private CurrencyFactory currency;
     private Scanner in;
-    private final String[] DOLLAR_KEYS;
+    int[] currencyList;
 
     public RegisterIO() {
-        register = new CashRegisterModel();
-
-        DOLLAR_KEYS = generateKeyArray();
+        currencyList = new int[] { 20, 10, 5, 2, 1 };
+        currency = new CurrencyFactory(currencyList);
+        register = new CashRegisterModel(currency);
 
         startApplication();
-    }
-
-    private String[] generateKeyArray() {
-        String[] keys = new String[5];
-
-        keys[0] = "TWENTY";
-        keys[1] = "TEN";
-        keys[2] = "FIVE";
-        keys[3] = "TWO";
-        keys[4] = "ONE";
-
-        return keys;
     }
 
     private void startApplication() {
@@ -38,6 +27,7 @@ public class RegisterIO {
         String command;
 
         System.out.println("This is a cash register. \nYou have a few commands available to you.");
+        
         printHelpMenu();
         System.out.println("Ready for input... \n");
 
@@ -97,7 +87,7 @@ public class RegisterIO {
 
     private void showRegisterContents() {
         System.out.print(String.format("\n$%s ", register.getBalance()));
-        Map<String, Long> contents = register.getContents();
+        Map<Integer, Integer> contents = register.getContents();
 
         print(contents);
     }
@@ -108,12 +98,10 @@ public class RegisterIO {
         } catch (InvalidInputException e) {
             print(e);
         }
-
-
     }
 
     private void withdrawBills(String[] inputs) {
-        Map<String, Long> withdrawalValues;
+        Map<Integer, Integer> withdrawalValues;
 
         try {
             withdrawalValues = mapInput(inputs);
@@ -126,13 +114,11 @@ public class RegisterIO {
         } catch (ArrayIndexOutOfBoundsException e) {
             print(e);
         }
-
-
     }
 
     private void makeChange(String[] inputs) {
         try {
-            long value = Long.parseLong(inputs[1]);
+            int value = Integer.parseInt(inputs[1]);
 
             try {
                 print(register.makeChange(value));
@@ -144,19 +130,21 @@ public class RegisterIO {
         }
     }
 
-    private Map<String, Long> mapInput(String[] input) {
+    private Map<Integer, Integer> mapInput(String[] input) {
         String command = input[0];
+        int[] currencyInputs;
 
         try {
-            Map<String, Long> inputMap;
+            Map<Integer, Integer> inputMap;
 
-            long twenties = Long.parseLong(input[1]);
-            long tens = Long.parseLong(input[2]);
-            long fives = Long.parseLong(input[3]);
-            long twos = Long.parseLong(input[4]);
-            long ones = Long.parseLong(input[5]);
+            int twenties = Integer.parseInt(input[1]);
+            int tens = Integer.parseInt(input[2]);
+            int fives = Integer.parseInt(input[3]);
+            int twos = Integer.parseInt(input[4]);
+            int ones = Integer.parseInt(input[5]);
+            currencyInputs = new int[] { twenties, tens, fives, twos, ones };
 
-            inputMap = new RegisterContentsFactory(ones, twos, fives, tens, twenties).getContents();
+            inputMap = currency.getAsMap(currencyInputs);
 
             return inputMap;
         } catch (ArrayIndexOutOfBoundsException e) {
@@ -168,8 +156,8 @@ public class RegisterIO {
         System.out.println(e.getMessage());
     }
 
-    private void print(Map<String, Long> value) {
-        for (String key : DOLLAR_KEYS) {
+    private void print(Map<Integer, Integer> value) {
+        for (int key : currency.getAsArray()) {
             System.out.print(value.get(key) + " ");
         }
 
